@@ -15,6 +15,7 @@
       --bg-light: #fffaf8;      /* Very light warm background */
       --text-main: #2d2d2d;     /* Soft black */
       --text-muted: #6e6e6e;
+      --gcash-blue: #007bff;
     }
 
     * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
@@ -147,8 +148,39 @@
     .modal-footer { padding: 1.4rem 1.6rem; border-top: 1px solid #f0f0f0; background: #fafafa; border-radius: 0 0 24px 24px; }
     .cart-total { display: flex; justify-content: space-between; font-weight: 800; font-size: 1.2rem; margin-bottom: 1.2rem; color: var(--text-main); }
     .cart-total span:last-child { color: var(--primary); }
+
+    /* CHECKOUT UI */
+    .payment-options { display: flex; flex-direction: column; gap: 0.8rem; margin-bottom: 1.5rem; }
+    .payment-option { display: flex; align-items: center; gap: 1rem; padding: 1rem; border: 2px solid #eee; border-radius: 12px; cursor: pointer; transition: all 0.2s; }
+    .payment-option.selected { border-color: var(--primary); background: #fff5f5; }
+    .payment-option input { accent-color: var(--primary); transform: scale(1.2); }
+    .payment-option i { font-size: 1.5rem; color: var(--primary); }
+    .payment-option-info { flex: 1; }
+    .payment-option-info h4 { font-size: 1rem; font-weight: 700; color: var(--text-main); }
+    .payment-option-info p { font-size: 0.8rem; color: #777; }
+
     .checkout-btn { background: var(--primary); color: #fff; border: none; padding: 1.1rem; border-radius: 50px; font-weight: 800; font-size: 1.05rem; cursor: pointer; width: 100%; transition: all 0.2s; box-shadow: 0 6px 20px rgba(255, 77, 79, 0.3); }
     .checkout-btn:hover { background: var(--primary-dark); transform: translateY(-2px); }
+
+    /* GCASH MODAL SPECIFIC */
+    .gcash-header { background: var(--gcash-blue); color: #fff; padding: 1.5rem; text-align: center; }
+    .gcash-header i { font-size: 3rem; margin-bottom: 0.5rem; }
+    .gcash-header h3 { font-size: 1.3rem; font-weight: 700; }
+    .gcash-body { padding: 2rem; }
+    .gcash-input-group { margin-bottom: 1.5rem; }
+    .gcash-input-group label { display: block; font-weight: 600; margin-bottom: 0.5rem; font-size: 0.95rem; }
+    .gcash-input-group input { width: 100%; padding: 1rem; border: 2px solid #eee; border-radius: 12px; font-size: 1.1rem; outline: none; transition: border 0.2s; letter-spacing: 1px; }
+    .gcash-input-group input:focus { border-color: var(--gcash-blue); }
+    .gcash-amount { text-align: center; font-size: 2rem; font-weight: 900; color: var(--gcash-blue); margin-bottom: 1.5rem; }
+    
+    .gcash-loading { display: none; text-align: center; padding: 2rem; }
+    .gcash-loading i { font-size: 3rem; color: var(--gcash-blue); animation: spin 1s linear infinite; margin-bottom: 1rem; }
+    @keyframes spin { 100% { transform: rotate(360deg); } }
+    
+    .gcash-success { display: none; text-align: center; padding: 2rem; }
+    .gcash-success i { font-size: 4rem; color: #28a745; margin-bottom: 1rem; }
+    .gcash-success h3 { font-size: 1.5rem; margin-bottom: 0.5rem; color: var(--text-main); }
+    .gcash-success p { color: #666; margin-bottom: 1rem; }
 
     /* LOCATION MODAL SPECIFIC */
     .location-list { display: flex; flex-direction: column; gap: 0.8rem; margin-top: 0.5rem; }
@@ -213,13 +245,6 @@
     /* TOAST */
     .toast { position: fixed; bottom: 120px; left: 50%; transform: translateX(-50%) translateY(30px); background: #28a745; color: #fff; padding: 1rem 2rem; border-radius: 50px; font-weight: 800; font-size: 1rem; box-shadow: 0 10px 30px rgba(40, 167, 69, 0.3); opacity: 0; visibility: hidden; transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); z-index: 500; display: flex; align-items: center; gap: 0.6rem; }
     .toast.show { opacity: 1; visibility: visible; transform: translateX(-50%) translateY(0); }
-
-    /* CHECKOUT */
-    .checkout-summary { text-align: center; padding: 2rem 0; }
-    .checkout-summary i { font-size: 5rem; color: #28a745; margin-bottom: 1.5rem; animation: scaleIn 0.5s ease; }
-    @keyframes scaleIn { 0% { transform: scale(0); } 80% { transform: scale(1.1); } 100% { transform: scale(1); } }
-    .checkout-summary h3 { font-size: 1.8rem; margin-bottom: 0.8rem; color: var(--text-main); }
-    .checkout-summary p { color: #666; margin-bottom: 1.5rem; font-size: 1.05rem; line-height: 1.6; }
 
     /* RESPONSIVE */
     @media (max-width: 900px) {
@@ -449,11 +474,69 @@
       </div>
       <div class="modal-body" id="cartBody"></div>
       <div class="modal-footer" id="cartFooter" style="display:none;">
+        
+        <!-- PAYMENT OPTIONS -->
+        <div class="payment-options">
+          <label class="payment-option selected" id="opt-cod" onclick="selectPayment('cod')">
+            <input type="radio" name="payment" checked>
+            <i class="fas fa-money-bill-wave" style="color: #28a745;"></i>
+            <div class="payment-option-info">
+              <h4>Cash on Delivery</h4>
+              <p>Pay when your order arrives</p>
+            </div>
+          </label>
+          <label class="payment-option" id="opt-gcash" onclick="selectPayment('gcash')">
+            <input type="radio" name="payment">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/GCash_logo.svg/2560px-GCash_logo.svg.png" alt="GCash" style="height: 20px; object-fit: contain;">
+            <div class="payment-option-info">
+              <h4>GCash</h4>
+              <p>Pay via GCash e-wallet</p>
+            </div>
+          </label>
+        </div>
+
         <div class="cart-total">
           <span>Total:</span>
           <span id="cartTotal">₱0</span>
         </div>
-        <button class="checkout-btn" onclick="checkout()"><i class="fas fa-check-circle"></i> Place Order</button>
+        <button class="checkout-btn" onclick="processCheckout()"><i class="fas fa-check-circle"></i> Place Order</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== GCASH MODAL ========== -->
+  <div class="modal-overlay" id="gcashModal">
+    <div class="modal" style="max-width: 420px;">
+      <div class="gcash-header">
+        <i class="fas fa-wallet"></i>
+        <h3>GCash Payment</h3>
+        <p style="font-size: 0.85rem; opacity: 0.8; margin-top: 5px;">Secure Checkout</p>
+      </div>
+      <div class="gcash-body" id="gcashBody">
+        <div class="gcash-amount" id="gcashAmount">₱0.00</div>
+        
+        <div class="gcash-input-group">
+          <label>GCash Mobile Number</label>
+          <input type="tel" id="gcashNumber" placeholder="09XX XXX XXXX" maxlength="11">
+        </div>
+        
+        <button class="checkout-btn" style="background: var(--gcash-blue); box-shadow: 0 6px 20px rgba(0, 123, 255, 0.3);" onclick="submitGcash()">Pay Now</button>
+      </div>
+      
+      <!-- GCASH LOADING -->
+      <div class="gcash-loading" id="gcashLoading">
+        <i class="fas fa-spinner"></i>
+        <h3>Processing Payment...</h3>
+        <p style="color: #666; font-size: 0.9rem;">Please do not close this window.</p>
+      </div>
+
+      <!-- GCASH SUCCESS -->
+      <div class="gcash-success" id="gcashSuccess">
+        <i class="fas fa-check-circle"></i>
+        <h3>Payment Successful!</h3>
+        <p id="gcashRef">Ref No: 123456789</p>
+        <p style="font-size: 0.85rem; color: #888;">Your order is now being prepared.</p>
+        <button class="checkout-btn" style="margin-top: 20px;" onclick="finishGcashOrder()">View Order</button>
       </div>
     </div>
   </div>
@@ -504,39 +587,65 @@
     }
     setInterval(nextSlide, 4000);
 
-    /* ========== EXPANDED FOOD DATABASE (Real Menu Items with matched images) ========== */
+    /* ========== EXPANDED FOOD DATABASE ========== */
     const foodDB = [
-      // --- MANG INASAL (Real Items) ---
-      { id: 101, name: "Mang Inasal Paa Large (1 Rice)", price: 149, rating: 4.8, desc: "Signature Chicken Inasal Paa (leg quarter) grilled with annatto oil, served with rice and spiced vinegar.", cat: "filipino", tags: ["mang inasal","chicken","inasal","grilled","filipino"], img: "https://images.unsplash.com/photo-1598515214211-89d3c73ae83b?w=800&h=600&fit=crop&crop=center", badge: "Filipino Favorite", bestSeller: true, delivery: "20–30 min", fee: "₱39 delivery", reviews: [{user:"Jose M.", stars:5, text:"The classic Mang Inasal taste. Sarap!"}] },
-      { id: 102, name: "Mang Inasal Pecho Large (1 Rice)", price: 174, rating: 4.8, desc: "Juicy Chicken Inasal Pecho (breast) grilled to perfection, served with rice and spiced vinegar.", cat: "filipino", tags: ["mang inasal","chicken","inasal","pecho","filipino"], img: "https://images.unsplash.com/photo-1598515214211-89d3c73ae83b?w=800&h=600&fit=crop&crop=center", badge: null, bestSeller: false, delivery: "20–30 min", fee: "₱39 delivery", reviews: [{user:"Maria L.", stars:5, text:"Juicy and flavorful. Love the chicken oil!"}] },
-      { id: 103, name: "Mang Inasal Pork BBQ (2 pcs)", price: 118, rating: 4.7, desc: "Two sticks of sweet and savory grilled pork barbecue, served with spiced vinegar.", cat: "filipino", tags: ["mang inasal","pork","bbq","grilled","filipino"], img: "https://images.unsplash.com/photo-1529193591184-b1d58069ecdd?w=800&h=600&fit=crop&crop=center", badge: null, bestSeller: false, delivery: "20–30 min", fee: "₱29 delivery", reviews: [{user:"Carlo P.", stars:5, text:"Perfectly grilled. The marinade is delicious."}] },
-      { id: 104, name: "Mang Inasal Extra Creamy Halo-Halo", price: 113, rating: 4.9, desc: "A delightful blend of milk and ice, topped with classic halo-halo favorites like ube, leche flan, and sweet beans.", cat: "dessert", tags: ["mang inasal","halo-halo","dessert","sweet","filipino"], img: "https://images.unsplash.com/photo-1551024601-bec78aea704b?w=800&h=600&fit=crop&crop=center", badge: "Filipino Favorite", bestSeller: true, delivery: "15–25 min", fee: "₱29 delivery", reviews: [{user:"Bea A.", stars:5, text:"Creamy and refreshing! The perfect ending to a meal."}] },
+      // CHICKEN
+      { id: 1, name: "Jollibee Chickenjoy (2pcs)", price: 175, rating: 4.9, desc: "Crispylicious, juicylicious fried chicken with gravy and rice. The Philippines' #1 fried chicken.", cat: "chicken", tags: ["chicken","fried","rice","jollibee","best seller","cheap"], img: "https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?w=800&h=600&fit=crop&crop=center", badge: "#1 Best Seller", bestSeller: true, delivery: "15–25 min", fee: "Free delivery", reviews: [{user:"Maria S.", stars:5, text:"Sobrang sarap! Perfectly cooked and delivered hot."},{user:"Juan D.", stars:5, text:"Crispy outside, juicy inside. The gravy is perfect!"}] },
+      { id: 5, name: "Chicken Hub Buffalo Wings", price: 249, rating: 4.6, desc: "Crispy chicken wings tossed in spicy buffalo sauce, served with ranch dip and celery sticks.", cat: "chicken", tags: ["wings","chicken","spicy","buffalo"], img: "https://images.unsplash.com/photo-1567620832903-9fc6debc209f?w=800&h=600&fit=crop&crop=center", badge: null, bestSeller: true, delivery: "20–30 min", fee: "₱39 delivery", reviews: [{user:"Mark P.", stars:5, text:"Perfect level of spice. Ranch dip is a must!"},{user:"Jenny W.", stars:4, text:"Crispy wings, good sauce. Wish there were more pieces."}] },
+      { id: 11, name: "Bonchon Soy Garlic Chicken", price: 289, rating: 4.7, desc: "Korean-style double-fried chicken glazed with sweet soy garlic sauce. Extra crispy.", cat: "chicken", tags: ["chicken","korean","garlic","soy","crispy"], img: "https://images.unsplash.com/photo-1626645738196-c2a7c87a8f58?w=800&h=600&fit=crop&crop=center", badge: null, bestSeller: false, delivery: "20–30 min", fee: "₱39 delivery", reviews: [{user:"Min-Ji K.", stars:5, text:"Extra crispy! The soy garlic glaze is addictive."}] },
+      { id: 14, name: "KFC Original Recipe Chicken", price: 185, rating: 4.7, desc: "Two pieces of the world-famous crispy fried chicken made with a secret blend of 11 herbs and spices.", cat: "chicken", tags: ["chicken","kfc","fried","classic","cheap"], img: "https://images.unsplash.com/photo-1562967914-608f82629710?w=800&h=600&fit=crop&crop=center", badge: null, bestSeller: false, delivery: "15–25 min", fee: "₱29 delivery", reviews: [{user:"Mark R.", stars:5, text:"Finger lickin' good! Just like I remember."}] },
+      { id: 19, name: "Peking Duck Wrap", price: 380, rating: 4.9, desc: "Tender roasted duck slices wrapped in thin pancakes with hoisin sauce and cucumber.", cat: "chicken", tags: ["duck","chinese","wrap","premium"], img: "https://images.unsplash.com/photo-1563245372-f21724e3856d?w=800&h=600&fit=crop&crop=center", badge: "Premium", bestSeller: true, delivery: "25–35 min", fee: "₱49 delivery", reviews: [{user:"David L.", stars:5, text:"So flavorful and tender. The sauce is perfect."}] },
+      { id: 30, name: "Jollibee Chicken Nuggets (6pcs)", price: 120, rating: 4.5, desc: "Bite-sized, breaded chicken nuggets served with your choice of dipping sauce.", cat: "chicken", tags: ["nuggets","chicken","fast food","jollibee","cheap"], img: "https://images.unsplash.com/photo-1562967916-eb82221dfb92?w=800&h=600&fit=crop&crop=center", badge: null, bestSeller: false, delivery: "15–25 min", fee: "₱29 delivery", reviews: [{user:"Liam G.", stars:4, text:"Classic nuggets. Perfect for a quick snack."}] },
 
-      // --- CHOWKING (Real Items) ---
-      { id: 201, name: "Chowking Siomai Chao Fan", price: 116, rating: 4.6, desc: "Wok-sarap fried rice with meat, egg, and kangkong leaves, topped with 4 pieces of siomai.", cat: "fastfood", tags: ["chowking","chao fan","siomai","rice","chinese"], img: "https://images.unsplash.com/photo-1603133872878-684f208fb84b?w=800&h=600&fit=crop&crop=center", badge: "Bestseller", bestSeller: true, delivery: "15–25 min", fee: "₱39 delivery", reviews: [{user:"Kevin C.", stars:5, text:"The wok flavor is amazing. Siomai is a must!"}] },
-      { id: 202, name: "Chowking Chinese-Style Fried Chicken Lauriat", price: 233, rating: 4.7, desc: "Crunchy Chinese-style fried chicken served with egg fried rice, pancit, siomai, and buchi.", cat: "fastfood", tags: ["chowking","fried chicken","lauriat","chinese"], img: "https://images.unsplash.com/photo-1562967914-608f82629710?w=800&h=600&fit=crop&crop=center", badge: "Complete Meal", bestSeller: true, delivery: "20–30 min", fee: "₱49 delivery", reviews: [{user:"Sarah L.", stars:5, text:"A complete feast! Love the variety in the lauriat."}] },
-      { id: 203, name: "Chowking Sweet & Sour Pork", price: 180, rating: 4.5, desc: "Tender pork slices in a signature sweet and sour sauce with bell peppers, red onions, and pineapple.", cat: "fastfood", tags: ["chowking","sweet and sour","pork","chinese"], img: "https://images.unsplash.com/photo-1546549032-9571cd6b27df?w=800&h=600&fit=crop&crop=center", badge: null, bestSeller: false, delivery: "20–30 min", fee: "₱39 delivery", reviews: [{user:"Mark R.", stars:4, text:"Classic sweet and sour. The sauce is perfect."}] },
-      { id: 204, name: "Chowking Beef Chao Fan", price: 150, rating: 4.7, desc: "Mas beefy, mas pinasarap! Wok-sarap fried rice with tender beef strips and vegetables.", cat: "fastfood", tags: ["chowking","beef","chao fan","rice","chinese"], img: "https://images.unsplash.com/photo-1512058564366-18510be2db19?w=800&h=600&fit=crop&crop=center", badge: null, bestSeller: false, delivery: "15–25 min", fee: "₱39 delivery", reviews: [{user:"Ella M.", stars:5, text:"So much beef! Very filling and flavorful."}] },
+      // BURGERS
+      { id: 2, name: "Burger King Whopper", price: 220, rating: 4.7, desc: "Flame-grilled 1/4 lb beef patty, fresh tomatoes, lettuce, mayo, ketchup, pickles, and onions.", cat: "burger", tags: ["burger","whopper","beef","american"], img: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=800&h=600&fit=crop&crop=center", badge: null, bestSeller: true, delivery: "15–25 min", fee: "₱29 delivery", reviews: [{user:"Carlos M.", stars:5, text:"Flame-grilled perfection. Tastes fresh every time."}] },
+      { id: 12, name: "Shake Shack ShackBurger", price: 320, rating: 4.8, desc: "Angus beef patty with American cheese, lettuce, tomato, and ShackSauce on a toasted potato bun.", cat: "burger", tags: ["burger","shake shack","angus","cheese"], img: "https://images.unsplash.com/photo-1553979459-d2229ba7433b?w=800&h=600&fit=crop&crop=center", badge: null, bestSeller: false, delivery: "20–30 min", fee: "₱49 delivery", reviews: [{user:"Nicole P.", stars:5, text:"Premium taste! The ShackSauce makes it special."}] },
+      { id: 13, name: "McDonald's Big Mac", price: 210, rating: 4.6, desc: "Two 100% pure beef patties, Big Mac sauce, lettuce, cheese, pickles, and onions on a sesame seed bun.", cat: "burger", tags: ["burger","mcdonalds","beef","classic","cheap"], img: "https://images.unsplash.com/photo-1582196016295-f8c8bd4b3a99?w=800&h=600&fit=crop&crop=center", badge: "Classic", bestSeller: true, delivery: "15–25 min", fee: "₱39 delivery", reviews: [{user:"Paolo M.", stars:5, text:"The classic taste never fails. Sauce is iconic."}] },
+      { id: 20, name: "Double Smash Bacon Burger", price: 285, rating: 4.8, desc: "Two smashed beef patties, crispy bacon, melted cheddar, caramelized onions, and special sauce.", cat: "burger", tags: ["burger","bacon","smash","beef"], img: "https://images.unsplash.com/photo-1594212699903-ec8a3eca50f5?w=800&h=600&fit=crop&crop=center", badge: "New", bestSeller: false, delivery: "20–30 min", fee: "₱39 delivery", reviews: [{user:"Sam K.", stars:5, text:"Best smash burger in town. So juicy!"}] },
+      { id: 31, name: "Jollibee Yumburger", price: 85, rating: 4.4, desc: "The classic Pinoy burger! 100% beef patty with Jollibee's signature dressing on a soft bun.", cat: "burger", tags: ["burger","jollibee","fast food","cheap","beef"], img: "https://images.unsplash.com/photo-1550547660-d9450f859349?w=800&h=600&fit=crop&crop=center", badge: "Fast Food", bestSeller: false, delivery: "15–25 min", fee: "₱29 delivery", reviews: [{user:"Tina B.", stars:5, text:"Childhood favorite! The sauce is what makes it."}] },
 
-      // --- KFC (Real Items) ---
-      { id: 301, name: "KFC 1-PC Chicken Meal with Soup", price: 205, rating: 4.7, desc: "One piece of KFC's Original Recipe or Hot & Crispy chicken, served with rice, soup, and a drink.", cat: "fastfood", tags: ["kfc","chicken","fried chicken","meal"], img: "https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?w=800&h=600&fit=crop&crop=center", badge: "Classic", bestSeller: true, delivery: "15–25 min", fee: "₱39 delivery", reviews: [{user:"James O.", stars:5, text:"Finger lickin' good! The soup is a nice touch."}] },
-      { id: 302, name: "KFC Zinger Steak Ala Carte", price: 155, rating: 4.8, desc: "Crispy chicken fillet drenched in rich Ala King sauce, served on a bed of butter rice.", cat: "fastfood", tags: ["kfc","zinger","steak","ala king","chicken"], img: "https://images.unsplash.com/photo-1615297928064-24977384d0da?w=800&h=600&fit=crop&crop=center", badge: "Popular", bestSeller: true, delivery: "15–25 min", fee: "₱39 delivery", reviews: [{user:"Nicole P.", stars:5, text:"The Ala King sauce is so creamy and rich. Love it!"}] },
-      { id: 303, name: "KFC Famous Bowl", price: 90, rating: 4.6, desc: "KFC's snack favorite: creamy mashed potatoes, corn, crispy chicken bites, and gravy all in one bowl.", cat: "fastfood", tags: ["kfc","famous bowl","chicken","mashed potato"], img: "https://images.unsplash.com/photo-1547592180-85f173990554?w=800&h=600&fit=crop&crop=center", badge: null, bestSeller: false, delivery: "10–20 min", fee: "₱29 delivery", reviews: [{user:"David K.", stars:4, text:"Comfort food in a bowl. The gravy makes it."}] },
-      { id: 304, name: "KFC 8-PC Bucket Combo", price: 925, rating: 4.9, desc: "8 pieces of KFC chicken (Original Recipe or Hot & Crispy), 4 rice, 4 sides, and 4 drinks. Perfect for sharing!", cat: "fastfood", tags: ["kfc","bucket","chicken","family","sharing"], img: "https://images.unsplash.com/photo-1562967914-608f82629710?w=800&h=600&fit=crop&crop=center", badge: "Family Size", bestSeller: true, delivery: "20–30 min", fee: "₱49 delivery", reviews: [{user:"Chris E.", stars:5, text:"The ultimate family meal. Everyone loves it!"}] },
+      // JAPANESE
+      { id: 3, name: "Sushi Zen Salmon Roll", price: 380, rating: 4.9, desc: "Fresh Norwegian salmon, cream cheese, cucumber, and avocado wrapped in sushi rice and nori.", cat: "japanese", tags: ["sushi","salmon","japanese","healthy"], img: "https://images.unsplash.com/photo-1579584425555-c3ce17fd4351?w=800&h=600&fit=crop&crop=center", badge: null, bestSeller: true, delivery: "25–35 min", fee: "₱49 delivery", reviews: [{user:"Kenji T.", stars:5, text:"Fresh salmon, great texture. Authentic taste!"}] },
+      { id: 7, name: "Noodle House Tonkotsu Ramen", price: 320, rating: 4.8, desc: "Rich pork bone broth, chashu pork, soft-boiled egg, bamboo shoots, and green onions.", cat: "japanese", tags: ["ramen","noodles","japanese","soup","pork"], img: "https://images.unsplash.com/photo-1569718212165-3a8278d5f624?w=800&h=600&fit=crop&crop=center", badge: "Popular", bestSeller: false, delivery: "20–30 min", fee: "₱39 delivery", reviews: [{user:"Hiro N.", stars:5, text:"Rich and creamy broth. Tastes like Japan!"}] },
+      { id: 10, name: "Pepper Lunch Beef Pepper Rice", price: 295, rating: 4.8, desc: "Sizzling beef strips with pepper rice, corn, and signature honey brown sauce on a hot plate.", cat: "japanese", tags: ["beef","rice","pepper lunch","sizzling"], img: "https://images.unsplash.com/photo-1544025162-d76694265947?w=800&h=600&fit=crop&crop=center", badge: null, bestSeller: false, delivery: "20–30 min", fee: "₱39 delivery", reviews: [{user:"Kevin L.", stars:5, text:"Sizzling and flavorful! The honey brown sauce is amazing."}] },
+      { id: 21, name: "Spicy Tuna Sushi Bake", price: 350, rating: 4.7, desc: "Creamy spicy tuna, sushi rice, and kani topped with melted cheese and Japanese mayo.", cat: "japanese", tags: ["sushi bake","tuna","spicy","cheese"], img: "https://images.unsplash.com/photo-1611143669185-af224c5e3252?w=800&h=600&fit=crop&crop=center", badge: "Trending", bestSeller: true, delivery: "25–35 min", fee: "₱49 delivery", reviews: [{user:"Isabel C.", stars:5, text:"So rich and creamy! Perfect for sharing."}] },
 
-      // --- OTHER FILIPINO FAVORITES ---
+      // BREAKFAST
+      { id: 4, name: "Morning Brew Buttermilk Pancakes", price: 195, rating: 4.8, desc: "Fluffy buttermilk pancakes served with maple syrup, butter, and fresh strawberries.", cat: "breakfast", tags: ["pancakes","breakfast","sweet","morning"], img: "https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=800&h=600&fit=crop&crop=center", badge: "New", bestSeller: true, delivery: "10–20 min", fee: "Free delivery", reviews: [{user:"Emma L.", stars:5, text:"So fluffy! The strawberries were fresh."}] },
+      { id: 16, name: "Starbucks Caramel Macchiato", price: 160, rating: 4.7, desc: "Freshly steamed milk with vanilla syrup, marked with espresso and finished with a caramel drizzle.", cat: "breakfast", tags: ["coffee","drink","sweet","starbucks","morning"], img: "https://images.unsplash.com/photo-1485808191679-5f86510681a2?w=800&h=600&fit=crop&crop=center", badge: "Beverage", bestSeller: false, delivery: "10–20 min", fee: "₱29 delivery", reviews: [{user:"Ella M.", stars:5, text:"My morning routine. Perfect sweetness and strong espresso."}] },
+      { id: 22, name: "Avocado Toast & Egg", price: 220, rating: 4.6, desc: "Sourdough toast topped with smashed avocado, poached egg, chili flakes, and microgreens.", cat: "breakfast", tags: ["avocado","toast","healthy","egg","morning"], img: "https://images.unsplash.com/photo-1525351484163-7529414344d8?w=800&h=600&fit=crop&crop=center", badge: "Healthy", bestSeller: false, delivery: "15–25 min", fee: "₱39 delivery", reviews: [{user:"Sophie M.", stars:5, text:"Fresh and delicious. The egg was perfectly poached."}] },
+
+      // VEGAN
+      { id: 6, name: "Green Bowl Buddha Bowl", price: 260, rating: 4.8, desc: "Quinoa, roasted chickpeas, avocado, kale, cherry tomatoes, and tahini dressing.", cat: "vegan", tags: ["vegan","healthy","salad","bowl","vegetarian"], img: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=800&h=600&fit=crop&crop=center", badge: null, bestSeller: true, delivery: "15–25 min", fee: "Free delivery", reviews: [{user:"Olivia H.", stars:5, text:"Fresh ingredients, generous portion. Love the tahini!"}] },
+      { id: 23, name: "Impossible Burger", price: 290, rating: 4.7, desc: "Plant-based patty that tastes just like beef, topped with vegan cheese, lettuce, and tomato.", cat: "vegan", tags: ["vegan","burger","plant-based","healthy"], img: "https://images.unsplash.com/photo-1520072959219-c595dc870360?w=800&h=600&fit=crop&crop=center", badge: "Plant-Based", bestSeller: false, delivery: "20–30 min", fee: "₱39 delivery", reviews: [{user:"Leo T.", stars:5, text:"Can't believe it's vegan! Tastes exactly like a real burger."}] },
+
+      // DESSERTS
+      { id: 9, name: "Sugar & Spice Red Velvet Cake", price: 210, rating: 4.9, desc: "Moist red velvet layers with cream cheese frosting, topped with red velvet crumbs.", cat: "dessert", tags: ["cake","dessert","sweet","red velvet"], img: "https://images.unsplash.com/photo-1586985289688-ca3cf47d3e6e?w=800&h=600&fit=crop&crop=center", badge: null, bestSeller: false, delivery: "10–20 min", fee: "Free delivery", reviews: [{user:"Grace F.", stars:5, text:"The best red velvet I've ever had. So moist!"}] },
+      { id: 18, name: "Dunkin' Glazed Donuts (6pcs)", price: 150, rating: 4.6, desc: "Half a dozen classic, fluffy yeast donuts coated in a sweet, sticky glaze. Perfect for sharing.", cat: "dessert", tags: ["donut","sweet","dessert","dunkin","breakfast","cheap"], img: "https://images.unsplash.com/photo-1551024601-bec78aea704b?w=800&h=600&fit=crop&crop=center", badge: "Box of 6", bestSeller: false, delivery: "10–20 min", fee: "Free delivery", reviews: [{user:"Grace T.", stars:5, text:"Soft, fluffy, and perfectly glazed. So good!"}] },
+      { id: 24, name: "Matcha Lava Cake", price: 230, rating: 4.8, desc: "Warm matcha cake with a gooey white chocolate center, served with vanilla ice cream.", cat: "dessert", tags: ["matcha","cake","sweet","dessert"], img: "https://images.unsplash.com/photo-1563729784474-d77dbb933a9e?w=800&h=600&fit=crop&crop=center", badge: "Trending", bestSeller: true, delivery: "15–25 min", fee: "₱39 delivery", reviews: [{user:"Yuki S.", stars:5, text:"The matcha flavor is so rich. The lava center is perfect."}] },
+
+      // MEXICAN
+      { id: 8, name: "Taco Loco Beef Tacos", price: 180, rating: 4.5, desc: "Three soft corn tortillas with seasoned ground beef, lettuce, cheese, salsa, and sour cream.", cat: "mexican", tags: ["tacos","mexican","beef","cheap"], img: "https://images.unsplash.com/photo-1565299585323-38d6b0865b47?w=800&h=600&fit=crop&crop=center", badge: null, bestSeller: false, delivery: "15–25 min", fee: "₱29 delivery", reviews: [{user:"Diego R.", stars:5, text:"Authentic Mexican flavors. Salsa is fresh!"}] },
+      { id: 17, name: "Taco Bell Crunchwrap Supreme", price: 190, rating: 4.5, desc: "Seasoned beef, nacho cheese sauce, lettuce, tomatoes, and sour cream wrapped in a grilled flour tortilla with a tostada shell.", cat: "mexican", tags: ["taco","mexican","beef","cheese","tacobell"], img: "https://images.unsplash.com/photo-1619895092538-128341789043?w=800&h=600&fit=crop&crop=center", badge: "Fan Favorite", bestSeller: false, delivery: "15–25 min", fee: "₱39 delivery", reviews: [{user:"Luis G.", stars:5, text:"The crunch is real! Perfect blend of flavors."}] },
+      { id: 25, name: "Chicken Quesadilla", price: 220, rating: 4.6, desc: "Grilled flour tortilla filled with chicken, melted cheese, peppers, and onions. Served with salsa.", cat: "mexican", tags: ["quesadilla","chicken","cheese","mexican"], img: "https://images.unsplash.com/photo-1618040996337-56904b7850b9?w=800&h=600&fit=crop&crop=center", badge: null, bestSeller: false, delivery: "15–25 min", fee: "₱39 delivery", reviews: [{user:"Carlos G.", stars:5, text:"Cheesy and packed with chicken. So good!"}] },
+
+      // PIZZA
+      { id: 15, name: "Pizza Hut Pepperoni Pizza", price: 450, rating: 4.8, desc: "Large hand-tossed pizza loaded with pepperoni and gooey mozzarella cheese over rich tomato sauce.", cat: "pizza", tags: ["pizza","pepperoni","cheese","italian"], img: "https://images.unsplash.com/photo-1628840042765-356cda07504e?w=800&h=600&fit=crop&crop=center", badge: "Family Size", bestSeller: true, delivery: "20–30 min", fee: "₱49 delivery", reviews: [{user:"Chris E.", stars:5, text:"Cheesy, hot, and loaded with pepperoni. Perfect!"}] },
+      { id: 26, name: "Margherita Pizza", price: 380, rating: 4.7, desc: "Classic Italian pizza with San Marzano tomato sauce, fresh mozzarella, basil, and olive oil.", cat: "pizza", tags: ["pizza","margherita","cheese","italian","vegetarian"], img: "https://images.unsplash.com/photo-1574071318508-1cdbab80d002?w=800&h=600&fit=crop&crop=center", badge: "Classic", bestSeller: false, delivery: "20–30 min", fee: "₱49 delivery", reviews: [{user:"Giulia R.", stars:5, text:"Tastes just like the pizza I had in Naples."}] },
+
+      // FILIPINO FAVORITES
       { id: 27, name: "Pork Sisig", price: 250, rating: 4.9, desc: "Sizzling chopped pork jowl and liver, seasoned with calamansi, chili, and onions. Served on a hot plate.", cat: "filipino", tags: ["sisig","pork","filipino","spicy","sizzling"], img: "https://images.unsplash.com/photo-1625937286074-9ca519d5d9df?w=800&h=600&fit=crop&crop=center", badge: "Filipino Classic", bestSeller: true, delivery: "20–30 min", fee: "₱39 delivery", reviews: [{user:"Aiza S.", stars:5, text:"The best sisig! Perfectly crispy and spicy."}] },
+      { id: 28, name: "Lechon Kawali", price: 290, rating: 4.8, desc: "Crispy deep-fried pork belly served with lechon sauce and pickled papaya (atchara).", cat: "filipino", tags: ["lechon","pork","filipino","crispy"], img: "https://images.unsplash.com/photo-1625937286074-9ca519d5d9df?w=800&h=600&fit=crop&crop=center", badge: null, bestSeller: false, delivery: "20–30 min", fee: "₱39 delivery", reviews: [{user:"Mang Tonyo", stars:5, text:"Crispy skin, tender meat. Sarap!"}] },
+      { id: 29, name: "Chicken Adobo", price: 220, rating: 4.7, desc: "Chicken simmered in soy sauce, vinegar, garlic, and bay leaves. A true Filipino comfort food.", cat: "filipino", tags: ["adobo","chicken","filipino","classic"], img: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800&h=600&fit=crop&crop=center", badge: "Comfort Food", bestSeller: false, delivery: "20–30 min", fee: "₱29 delivery", reviews: [{user:"Lito P.", stars:5, text:"Tastes exactly like my mom's adobo. Perfect."}] },
       { id: 32, name: "Sinigang na Baboy", price: 280, rating: 4.8, desc: "Sour pork soup with tamarind, kangkong, radish, and tomatoes. Perfect for rainy days.", cat: "filipino", tags: ["sinigang","soup","pork","filipino","sour"], img: "https://images.unsplash.com/photo-1547592180-85f173990554?w=800&h=600&fit=crop&crop=center", badge: "Comfort Food", bestSeller: true, delivery: "25–35 min", fee: "₱49 delivery", reviews: [{user:"Nena R.", stars:5, text:"Sobrang sarap ng sabaw! Just the right amount of sourness."}] },
       { id: 33, name: "Kare-Kare", price: 320, rating: 4.7, desc: "Oxtail stew in a thick peanut sauce, served with bagoong (shrimp paste) and fresh vegetables.", cat: "filipino", tags: ["kare-kare","peanut","oxtail","filipino","stew"], img: "https://images.unsplash.com/photo-1547592180-85f173990554?w=800&h=600&fit=crop&crop=center", badge: null, bestSeller: false, delivery: "25–35 min", fee: "₱49 delivery", reviews: [{user:"Carlo M.", stars:5, text:"Rich peanut sauce, tender oxtail. Perfect with bagoong!"}] },
+      { id: 34, name: "Pancit Bihon Guisado", price: 180, rating: 4.6, desc: "Stir-fried rice noodles with chicken, shrimp, cabbage, and carrots. A Filipino party staple.", cat: "filipino", tags: ["pancit","noodles","filipino","stir-fry"], img: "https://images.unsplash.com/photo-1585032226651-759b368d7246?w=800&h=600&fit=crop&crop=center", badge: null, bestSeller: false, delivery: "15–25 min", fee: "₱29 delivery", reviews: [{user:"Lorna T.", stars:4, text:"Tastes like home. Great for birthdays!"}] },
+      { id: 35, name: "Halo-Halo Especial", price: 150, rating: 4.9, desc: "Shaved ice with evaporated milk, ube ice cream, leche flan, sweet beans, and fruits.", cat: "dessert", tags: ["halo-halo","dessert","filipino","cold","sweet"], img: "https://images.unsplash.com/photo-1551024601-bec78aea704b?w=800&h=600&fit=crop&crop=center", badge: "Filipino Favorite", bestSeller: true, delivery: "10–20 min", fee: "₱29 delivery", reviews: [{user:"Bea A.", stars:5, text:"Refreshing and sweet! Perfect for summer."}] },
 
-      // --- OTHER EXISTING FAVORITES ---
-      { id: 1, name: "Jollibee Chickenjoy (2pcs)", price: 175, rating: 4.9, desc: "Crispylicious, juicylicious fried chicken with gravy and rice. The Philippines' #1 fried chicken.", cat: "chicken", tags: ["chicken","fried","rice","jollibee","best seller","cheap"], img: "https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?w=800&h=600&fit=crop&crop=center", badge: "#1 Best Seller", bestSeller: true, delivery: "15–25 min", fee: "Free delivery", reviews: [{user:"Maria S.", stars:5, text:"Sobrang sarap! Perfectly cooked and delivered hot."}] },
-      { id: 2, name: "Burger King Whopper", price: 220, rating: 4.7, desc: "Flame-grilled 1/4 lb beef patty, fresh tomatoes, lettuce, mayo, ketchup, pickles, and onions.", cat: "burger", tags: ["burger","whopper","beef","american"], img: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=800&h=600&fit=crop&crop=center", badge: null, bestSeller: true, delivery: "15–25 min", fee: "₱29 delivery", reviews: [{user:"Carlos M.", stars:5, text:"Flame-grilled perfection. Tastes fresh every time."}] },
-      { id: 3, name: "Sushi Zen Salmon Roll", price: 380, rating: 4.9, desc: "Fresh Norwegian salmon, cream cheese, cucumber, and avocado wrapped in sushi rice and nori.", cat: "japanese", tags: ["sushi","salmon","japanese","healthy"], img: "https://images.unsplash.com/photo-1579584425555-c3ce17fd4351?w=800&h=600&fit=crop&crop=center", badge: null, bestSeller: true, delivery: "25–35 min", fee: "₱49 delivery", reviews: [{user:"Kenji T.", stars:5, text:"Fresh salmon, great texture. Authentic taste!"}] },
-      { id: 4, name: "Morning Brew Buttermilk Pancakes", price: 195, rating: 4.8, desc: "Fluffy buttermilk pancakes served with maple syrup, butter, and fresh strawberries.", cat: "breakfast", tags: ["pancakes","breakfast","sweet","morning"], img: "https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=800&h=600&fit=crop&crop=center", badge: "New", bestSeller: true, delivery: "10–20 min", fee: "Free delivery", reviews: [{user:"Emma L.", stars:5, text:"So fluffy! The strawberries were fresh."}] },
-      { id: 6, name: "Green Bowl Buddha Bowl", price: 260, rating: 4.8, desc: "Quinoa, roasted chickpeas, avocado, kale, cherry tomatoes, and tahini dressing.", cat: "vegan", tags: ["vegan","healthy","salad","bowl","vegetarian"], img: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=800&h=600&fit=crop&crop=center", badge: null, bestSeller: true, delivery: "15–25 min", fee: "Free delivery", reviews: [{user:"Olivia H.", stars:5, text:"Fresh ingredients, generous portion. Love the tahini!"}] },
-      { id: 7, name: "Noodle House Tonkotsu Ramen", price: 320, rating: 4.8, desc: "Rich pork bone broth, chashu pork, soft-boiled egg, bamboo shoots, and green onions.", cat: "japanese", tags: ["ramen","noodles","japanese","soup","pork"], img: "https://images.unsplash.com/photo-1569718212165-3a8278d5f624?w=800&h=600&fit=crop&crop=center", badge: "Popular", bestSeller: false, delivery: "20–30 min", fee: "₱39 delivery", reviews: [{user:"Hiro N.", stars:5, text:"Rich and creamy broth. Tastes like Japan!"}] },
-      { id: 9, name: "Sugar & Spice Red Velvet Cake", price: 210, rating: 4.9, desc: "Moist red velvet layers with cream cheese frosting, topped with red velvet crumbs.", cat: "dessert", tags: ["cake","dessert","sweet","red velvet"], img: "https://images.unsplash.com/photo-1586985289688-ca3cf47d3e6e?w=800&h=600&fit=crop&crop=center", badge: null, bestSeller: false, delivery: "10–20 min", fee: "Free delivery", reviews: [{user:"Grace F.", stars:5, text:"The best red velvet I've ever had. So moist!"}] }
+      // FAST FOOD CLASSICS
+      { id: 36, name: "Jollibee Spaghetti", price: 120, rating: 4.5, desc: "Sweet-style spaghetti with hotdog bits and chunky tomato sauce. A Filipino childhood classic.", cat: "fastfood", tags: ["spaghetti","pasta","jollibee","fast food","sweet"], img: "https://images.unsplash.com/photo-1621996346565-e3dbc646d9a9?w=800&h=600&fit=crop&crop=center", badge: "Fast Food", bestSeller: false, delivery: "15–25 min", fee: "₱29 delivery", reviews: [{user:"Kevin C.", stars:5, text:"The sweet sauce is uniquely Jollibee. Love it!"}] },
+      { id: 37, name: "McDonald's McSpaghetti", price: 110, rating: 4.4, desc: "Meaty spaghetti with a rich tomato sauce and grated cheese.", cat: "fastfood", tags: ["spaghetti","mcdonalds","fast food","pasta"], img: "https://images.unsplash.com/photo-1546549032-9571cd6b27df?w=800&h=600&fit=crop&crop=center", badge: null, bestSeller: false, delivery: "15–25 min", fee: "₱29 delivery", reviews: [{user:"Jasmine V.", stars:4, text:"A bit sweet, but hits the spot for a quick meal."}] },
+      { id: 38, name: "KFC Zinger Burger", price: 165, rating: 4.6, desc: "Spicy, crispy chicken fillet with lettuce and mayo in a toasted sesame seed bun.", cat: "fastfood", tags: ["burger","chicken","kfc","spicy","fast food"], img: "https://images.unsplash.com/photo-1615297928064-24977384d0da?w=800&h=600&fit=crop&crop=center", badge: "Spicy", bestSeller: true, delivery: "15–25 min", fee: "₱39 delivery", reviews: [{user:"Ethan R.", stars:5, text:"The spicy crunch is perfect. Better than a regular chicken sandwich!"}] }
     ];
 
     /* ========== STATE & INIT ========== */
@@ -545,11 +654,100 @@
     let currentSearch = '';
     let selectedLocation = { name: 'Set Delivery Address', address: '' };
     let tempLocation = { name: '', address: '' };
+    let currentPaymentMethod = 'cod'; // Default
 
     const savedLoc = localStorage.getItem('mrspeedy_location');
     if (savedLoc) {
       selectedLocation = JSON.parse(savedLoc);
       updateLocationUI();
+    }
+
+    /* ========== PAYMENT LOGIC ========== */
+    function selectPayment(method) {
+      currentPaymentMethod = method;
+      document.getElementById('opt-cod').classList.remove('selected');
+      document.getElementById('opt-gcash').classList.remove('selected');
+      document.getElementById('opt-' + method).classList.add('selected');
+    }
+
+    function processCheckout() {
+      if (cart.length === 0) return;
+      const total = getCartTotal();
+      
+      if (currentPaymentMethod === 'cod') {
+        // COD Checkout Flow
+        completeOrder("Cash on Delivery");
+      } else if (currentPaymentMethod === 'gcash') {
+        // GCash Checkout Flow
+        openGcashModal(total);
+      }
+    }
+
+    /* ========== GCASH API SIMULATION ========== */
+    function openGcashModal(amount) {
+      document.getElementById('cartModal').classList.remove('open'); // Close cart
+      
+      // Reset GCash Modal state
+      document.getElementById('gcashBody').style.display = 'block';
+      document.getElementById('gcashLoading').style.display = 'none';
+      document.getElementById('gcashSuccess').style.display = 'none';
+      document.getElementById('gcashNumber').value = '';
+      
+      // Set amount
+      document.getElementById('gcashAmount').textContent = '₱' + amount.toFixed(2);
+      
+      // Open modal
+      document.getElementById('gcashModal').classList.add('open');
+    }
+
+    function submitGcash() {
+      const number = document.getElementById('gcashNumber').value.trim();
+      if (number.length < 11 || !number.startsWith('09')) {
+        showToast('Please enter a valid 11-digit GCash number starting with 09.');
+        return;
+      }
+
+      // UI: Show loading
+      document.getElementById('gcashBody').style.display = 'none';
+      document.getElementById('gcashLoading').style.display = 'block';
+
+      // Simulate API Call (2 seconds delay)
+      setTimeout(() => {
+        // UI: Hide loading, show success
+        document.getElementById('gcashLoading').style.display = 'none';
+        document.getElementById('gcashSuccess').style.display = 'block';
+        
+        // Generate random ref number
+        const refNo = 'GC' + Math.floor(Math.random() * 900000000) + 100000000;
+        document.getElementById('gcashRef').textContent = `Ref No: ${refNo}`;
+      }, 2000);
+    }
+
+    function finishGcashOrder() {
+      document.getElementById('gcashModal').classList.remove('open');
+      completeOrder("GCash");
+    }
+
+    function completeOrder(paymentType) {
+      const total = getCartTotal();
+      const count = cart.reduce((s, i) => s + i.qty, 0);
+      const locText = selectedLocation.address ? `<strong>${selectedLocation.name}</strong> (${selectedLocation.address})` : 'your saved address';
+
+      // Clear cart
+      cart = []; saveCart();
+      
+      // Show success screen inside the Cart Modal
+      document.getElementById('cartModal').classList.add('open');
+      document.getElementById('cartBody').innerHTML = `
+        <div class="checkout-summary">
+          <i class="fas fa-check-circle"></i>
+          <h3>Order Placed!</h3>
+          <p>Your order of <strong>${count} item(s)</strong> totaling <strong>₱${total}</strong> is being prepared.</p>
+          <p style="font-size:0.95rem; margin-bottom: 0.5rem;">Paid via: <strong>${paymentType}</strong></p>
+          <p style="font-size:0.95rem; margin-bottom: 0.5rem;">Delivering to: ${locText}</p>
+          <p style="font-size:0.95rem;">Estimated delivery: <strong>20–30 minutes</strong> 🛵</p>
+        </div>`;
+      document.getElementById('cartFooter').style.display = 'none';
     }
 
     /* ========== LOCATION LOGIC ========== */
@@ -689,6 +887,8 @@
     }
     function openCart() {
       renderCart();
+      // Reset payment options to COD by default
+      selectPayment('cod');
       document.getElementById('cartModal').classList.add('open');
     }
     function closeCart() {
@@ -724,24 +924,6 @@
       body.innerHTML = html;
       footer.style.display = 'block';
       document.getElementById('cartTotal').textContent = '₱' + getCartTotal();
-    }
-    function checkout() {
-      if (cart.length === 0) return;
-      const total = getCartTotal();
-      const count = cart.reduce((s, i) => s + i.qty, 0);
-      
-      const locText = selectedLocation.address ? `<strong>${selectedLocation.name}</strong> (${selectedLocation.address})` : 'your saved address';
-
-      document.getElementById('cartBody').innerHTML = `
-        <div class="checkout-summary">
-          <i class="fas fa-check-circle"></i>
-          <h3>Order Placed!</h3>
-          <p>Your order of <strong>${count} item(s)</strong> totaling <strong>₱${total}</strong> is being prepared.</p>
-          <p style="font-size:0.95rem; margin-bottom: 0.5rem;">Delivering to: ${locText}</p>
-          <p style="font-size:0.95rem;">Estimated delivery: <strong>20–30 minutes</strong> 🛵</p>
-        </div>`;
-      document.getElementById('cartFooter').style.display = 'none';
-      cart = []; saveCart(); showToast('Order placed successfully! 🎉');
     }
 
     /* ========== TOAST ========== */
@@ -878,6 +1060,14 @@
     document.getElementById('foodDetailModal').addEventListener('click', function(e) { if (e.target === this) closeFoodDetail(); });
     document.getElementById('cartModal').addEventListener('click', function(e) { if (e.target === this) closeCart(); });
     document.getElementById('locationModal').addEventListener('click', function(e) { if (e.target === this) closeLocationModal(); });
+    
+    // Close GCash modal on outside click
+    document.getElementById('gcashModal').addEventListener('click', function(e) { 
+      if (e.target === this) {
+        document.getElementById('gcashModal').classList.remove('open');
+        document.getElementById('cartModal').classList.add('open'); // Reopen cart
+      }
+    });
 
     /* ========== AI CHATBOT ========== */
     const chatbotContainer = document.getElementById('chatbotContainer');
@@ -911,24 +1101,16 @@
         const cheap = foodDB.filter(f => f.price <= 220).sort((a,b) => a.price - b.price);
         return `💰 Here are the most affordable options:<br><br>${cheap.slice(0,4).map(f => formatFood(f)).join('<hr style="border:none;border-top:1px solid #eee;margin:0.6rem 0">')}`;
       }
-      if (text.match(/mang inasal|inasal/)) {
-        const mi = foodDB.filter(f => f.tags.includes('mang inasal') || f.tags.includes('inasal'));
-        return `🇵🇭 Mang Inasal favorites:<br><br>${mi.map(f => formatFood(f)).join('<hr style="border:none;border-top:1px solid #eee;margin:0.6rem 0">')}`;
-      }
-      if (text.match(/chowking|chao fan|lauriat/)) {
-        const ck = foodDB.filter(f => f.tags.includes('chowking') || f.tags.includes('chao fan') || f.tags.includes('lauriat'));
-        return `🇨🇳 Chowking favorites:<br><br>${ck.map(f => formatFood(f)).join('<hr style="border:none;border-top:1px solid #eee;margin:0.6rem 0">')}`;
-      }
-      if (text.match(/kfc|zinger|famous bowl/)) {
-        const kfc = foodDB.filter(f => f.tags.includes('kfc'));
-        return `🍗 KFC favorites:<br><br>${kfc.map(f => formatFood(f)).join('<hr style="border:none;border-top:1px solid #eee;margin:0.6rem 0">')}`;
+      if (text.match(/spicy|hot|maanghang|sili/)) {
+        const spicy = foodDB.filter(f => f.tags.includes('spicy') || f.tags.includes('buffalo'));
+        return `🌶️ For spice lovers:<br><br>${spicy.map(f => formatFood(f)).join('<hr style="border:none;border-top:1px solid #eee;margin:0.6rem 0">')}`;
       }
       if (text.match(/filipino|pinoy|adobo|sisig|lechon|sinigang|kare-kare|pancit/)) {
         const pinoy = foodDB.filter(f => f.cat === 'filipino');
         return `🇵🇭 Filipino favorites:<br><br>${pinoy.map(f => formatFood(f)).join('<hr style="border:none;border-top:1px solid #eee;margin:0.6rem 0">')}`;
       }
       if (text.match(/fast food|jollibee|mcdonalds|kfc|zinger|yumburger/)) {
-        const ff = foodDB.filter(f => f.cat === 'fastfood');
+        const ff = foodDB.filter(f => f.cat === 'fastfood' || f.tags.includes('fast food') || f.tags.includes('jollibee') || f.tags.includes('kfc') || f.tags.includes('mcdonalds'));
         return `🍟 Fast Food Classics:<br><br>${ff.map(f => formatFood(f)).join('<hr style="border:none;border-top:1px solid #eee;margin:0.6rem 0">')}`;
       }
       if (text.match(/chicken|manok|fried chicken/)) {
@@ -960,12 +1142,13 @@
         return `🌅 Breakfast picks:<br><br>${bf.map(f => formatFood(f)).join('<hr style="border:none;border-top:1px solid #eee;margin:0.6rem 0">')}`;
       }
       if (text.match(/delivery|deliver|shipping|speed|fast|bilis|mabilis|location|address/)) return `⚡ Mr. Speedy delivers in <strong>15–35 minutes</strong> depending on the restaurant. You can set your delivery address by clicking the location bar at the top!`;
-      if (text.match(/price|presyo|menu|magkano|how much/)) return `💵 Our menu ranges from <strong>₱85 to ₱925</strong>. Best value: <strong>Jollibee Yumburger (₱85)</strong> and <strong>KFC Famous Bowl (₱90)</strong>.`;
+      if (text.match(/price|presyo|menu|magkano|how much/)) return `💵 Our menu ranges from <strong>₱85 to ₱450</strong>. Best value: <strong>Jollibee Yumburger (₱85)</strong> and <strong>Jollibee Chicken Nuggets (₱120)</strong>.`;
+      if (text.match(/gcash|payment|bayad/)) return `💳 We accept <strong>Cash on Delivery</strong> and <strong>GCash</strong>. You can choose your payment method at checkout!`;
       
       const matched = foodDB.filter(f => f.name.toLowerCase().includes(text) || f.tags.some(t => t.includes(text) || text.includes(t)));
       if (matched.length > 0) return `Here's what I found for "<strong>${userText}</strong>":<br><br>${matched.slice(0,3).map(f => formatFood(f)).join('<hr style="border:none;border-top:1px solid #eee;margin:0.6rem 0">')}`;
       
-      return `🤔 I'm not sure about "<strong>${userText}</strong>" — but I can help with:<br><br>• <em>"Mang Inasal"</em><br>• <em>"Chowking"</em><br>• <em>"KFC"</em><br>• <em>"Filipino food"</em><br>• <em>"Fast food"</em><br>• <em>"What's the best seller?"</em>`;
+      return `🤔 I'm not sure about "<strong>${userText}</strong>" — but I can help with:<br><br>• <em>"What's the best seller?"</em><br>• <em>"Recommend something spicy"</em><br>• <em>"Show me cheap eats"</em><br>• <em>"Chicken recommendations"</em><br>• <em>"Filipino food"</em><br>• <em>"Fast food"</em>`;
     }
 
     function sendMessage(text) {
