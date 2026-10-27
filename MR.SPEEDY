@@ -1,0 +1,988 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mr. Speedy · food delivery</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    /* ========== NEW EYE-CATCHING COLOR PALETTE ========== */
+    :root {
+      --primary: #ff4d4f;       /* Vibrant Tomato Red */
+      --primary-dark: #d9363e;  /* Darker Red for hover */
+      --secondary: #ff7a45;     /* Warm Orange for CTAs */
+      --secondary-dark: #d95716;
+      --bg-light: #fffaf8;      /* Very light warm background */
+      --text-main: #2d2d2d;     /* Soft black */
+      --text-muted: #6e6e6e;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
+    body { background-color: var(--bg-light); color: var(--text-main); overflow-x: hidden; }
+    .container { max-width: 1200px; margin: 0 auto; padding: 0 1.5rem; }
+
+    /* ----- HEADER & NAVBAR ----- */
+    .navbar { background: #fff; box-shadow: 0 4px 20px rgba(255, 77, 79, 0.08); position: sticky; top: 0; z-index: 100; padding: 0.8rem 0; border-bottom: 2px solid #fff5f5; }
+    .nav-container { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; }
+    
+    .logo { display: flex; align-items: center; gap: 0.6rem; font-weight: 800; font-size: 1.6rem; letter-spacing: -0.5px; color: var(--primary); cursor: pointer; }
+    .logo-img { width: 52px; height: 52px; border-radius: 50%; object-fit: cover; border: 3px solid var(--primary); box-shadow: 0 4px 12px rgba(255, 77, 79, 0.3); transition: transform 0.3s ease; }
+    .logo:hover .logo-img { transform: scale(1.08) rotate(-4deg); }
+
+    /* LOCATION BAR */
+    .location-bar { display: flex; align-items: center; gap: 0.5rem; background: #fff5f5; padding: 0.5rem 1rem; border-radius: 40px; cursor: pointer; transition: all 0.2s; border: 1px solid #ffe3e3; margin-left: 1rem; max-width: 250px; }
+    .location-bar:hover { background: #ffebeb; border-color: var(--primary); transform: translateY(-1px); }
+    .location-bar i { color: var(--primary); }
+    .location-bar span { font-size: 0.9rem; font-weight: 600; color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .location-bar .fa-chevron-down { font-size: 0.7rem; color: var(--primary); margin-left: 0.2rem; }
+
+    /* SEARCH */
+    .search-area { flex: 1; max-width: 400px; display: flex; align-items: center; background: #f5f5f5; border-radius: 40px; padding: 0.25rem 0.25rem 0.25rem 1.25rem; transition: all 0.2s; border: 1px solid transparent; }
+    .search-area:focus-within { background: #fff; border-color: var(--secondary); box-shadow: 0 0 0 3px rgba(255, 122, 69, 0.2); }
+    .search-area i { color: var(--text-muted); font-size: 1rem; }
+    .search-area input { border: none; background: transparent; padding: 0.7rem 0.8rem; width: 100%; font-size: 0.95rem; outline: none; color: var(--text-main); }
+    .search-area button { background: var(--secondary); border: none; color: #fff; font-weight: 700; padding: 0.6rem 1.4rem; border-radius: 40px; font-size: 0.9rem; cursor: pointer; transition: background 0.2s; white-space: nowrap; box-shadow: 0 4px 10px rgba(255, 122, 69, 0.3); }
+    .search-area button:hover { background: var(--secondary-dark); transform: scale(1.02); }
+
+    .nav-icons { display: flex; align-items: center; gap: 1.2rem; }
+    .nav-icons button { text-decoration: none; color: var(--text-main); font-weight: 600; display: flex; align-items: center; gap: 0.4rem; font-size: 0.95rem; transition: color 0.2s; background: none; border: none; cursor: pointer; font-family: inherit; }
+    .nav-icons button i { font-size: 1.2rem; color: var(--primary); }
+    .nav-icons button:hover { color: var(--primary); }
+    .cart-badge { background: var(--secondary); color: #fff; border-radius: 50%; font-size: 0.75rem; font-weight: 800; width: 20px; height: 20px; display: inline-flex; align-items: center; justify-content: center; margin-left: 0.2rem; box-shadow: 0 2px 6px rgba(255, 122, 69, 0.4); }
+
+    /* SECONDARY NAVIGATION */
+    .sub-nav { background: #fff; border-bottom: 1px solid #f0f0f0; display: flex; justify-content: center; gap: 2rem; padding: 0.8rem 0; overflow-x: auto; white-space: nowrap; box-shadow: 0 2px 10px rgba(0,0,0,0.02); }
+    .sub-nav a { text-decoration: none; color: var(--text-muted); font-size: 0.95rem; font-weight: 600; transition: color 0.2s; display: flex; align-items: center; gap: 0.4rem; cursor: pointer; }
+    .sub-nav a i { color: var(--primary); }
+    .sub-nav a:hover { color: var(--primary); }
+    .sub-nav a.active { color: var(--primary); font-weight: 800; border-bottom: 3px solid var(--primary); padding-bottom: 0.5rem; margin-bottom: -0.9rem; }
+
+    /* HERO WITH IMAGE CAROUSEL */
+    .hero { background: linear-gradient(135deg, #fff0f0 0%, #ffe8d6 100%); margin-top: 1.8rem; border-radius: 30px; padding: 0; display: flex; align-items: stretch; justify-content: space-between; flex-wrap: wrap; gap: 0; overflow: hidden; min-height: 360px; box-shadow: 0 15px 35px rgba(255, 77, 79, 0.1); }
+    .hero-text { padding: 3.5rem; flex: 1; min-width: 300px; display: flex; flex-direction: column; justify-content: center; z-index: 2; }
+    .hero-text h1 { font-size: 3.2rem; font-weight: 900; line-height: 1.1; letter-spacing: -1.5px; max-width: 500px; color: var(--text-main); }
+    .hero-text .highlight { color: var(--primary); display: inline-block; position: relative; }
+    .hero-text p { font-size: 1.15rem; color: #555; margin: 1.2rem 0 2rem; max-width: 450px; line-height: 1.6; font-weight: 500; }
+    .hero-cta { background: var(--primary); color: #fff; border: none; padding: 1.1rem 2.8rem; border-radius: 50px; font-weight: 800; font-size: 1.1rem; cursor: pointer; transition: all 0.3s; display: inline-flex; align-items: center; gap: 0.6rem; box-shadow: 0 8px 25px rgba(255, 77, 79, 0.4); width: fit-content; }
+    .hero-cta:hover { background: var(--primary-dark); transform: translateY(-3px) scale(1.02); box-shadow: 0 12px 30px rgba(255, 77, 79, 0.5); }
+    
+    /* CAROUSEL CONTAINER */
+    .hero-image-container { flex: 1; min-width: 300px; position: relative; overflow: hidden; border-radius: 0 30px 30px 0; background: #000; }
+    .carousel-slide { position: absolute; top: 0; left: 0; width: 100%; height: 100%; opacity: 0; transition: opacity 1s ease-in-out, transform 6s linear; object-fit: cover; z-index: 1; }
+    .carousel-slide.active { opacity: 1; z-index: 2; transform: scale(1.05); }
+
+    /* CATEGORY PILLS */
+    .categories { display: flex; flex-wrap: wrap; gap: 0.7rem; margin: 2.5rem 0 1.5rem; }
+    .category-pill { background: #fff; padding: 0.7rem 1.5rem; border-radius: 40px; font-weight: 600; font-size: 0.9rem; display: flex; align-items: center; gap: 0.5rem; box-shadow: 0 2px 10px rgba(0,0,0,0.04); border: 1px solid #f0f0f0; cursor: pointer; transition: all 0.2s; color: var(--text-main); }
+    .category-pill i { color: var(--primary); font-size: 1rem; }
+    .category-pill:hover { background: #fff5f5; border-color: var(--primary); transform: translateY(-2px); box-shadow: 0 4px 15px rgba(255, 77, 79, 0.15); }
+    .category-pill.active { background: var(--primary); border-color: var(--primary); color: #fff; box-shadow: 0 6px 15px rgba(255, 77, 79, 0.3); }
+    .category-pill.active i { color: #fff; }
+
+    /* SECTION HEADERS */
+    .section-header { display: flex; justify-content: space-between; align-items: baseline; margin: 2rem 0 1.2rem; }
+    .section-header h2 { font-size: 1.8rem; font-weight: 800; letter-spacing: -0.5px; color: var(--text-main); }
+    .section-header a { text-decoration: none; color: var(--primary); font-weight: 700; font-size: 0.95rem; display: flex; align-items: center; gap: 0.3rem; cursor: pointer; transition: gap 0.2s; }
+    .section-header a:hover { gap: 0.6rem; }
+
+    /* FOOD CARDS */
+    .food-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1.8rem; margin-bottom: 3rem; }
+    .food-card { background: #fff; border-radius: 24px; overflow: hidden; box-shadow: 0 8px 25px -8px rgba(0,0,0,0.08); transition: all 0.3s ease; border: 1px solid #f0f0f0; display: flex; flex-direction: column; }
+    .food-card:hover { transform: translateY(-6px); box-shadow: 0 20px 40px -12px rgba(255, 77, 79, 0.2); border-color: #ffe3e3; }
+    .food-img { height: 190px; position: relative; overflow: hidden; background: #f5eef1; cursor: pointer; }
+    .food-img img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.4s ease; display: block; }
+    .food-card:hover .food-img img { transform: scale(1.1); }
+    .promo-badge { position: absolute; top: 12px; left: 12px; background: var(--secondary); color: #fff; font-size: 0.7rem; font-weight: 800; padding: 0.35rem 1rem; border-radius: 30px; text-transform: uppercase; z-index: 2; box-shadow: 0 4px 10px rgba(255, 122, 69, 0.4); }
+    .food-content { padding: 1.2rem 1.2rem 1.4rem; display: flex; flex-direction: column; flex: 1; }
+    .food-name { font-weight: 800; font-size: 1.1rem; margin-bottom: 0.4rem; display: flex; justify-content: space-between; align-items: center; gap: 0.5rem; color: var(--text-main); }
+    .food-name span:first-child { flex: 1; }
+    .rating { background: #fff8e1; padding: 0.25rem 0.7rem; border-radius: 30px; font-size: 0.8rem; font-weight: 800; display: flex; align-items: center; gap: 0.25rem; white-space: nowrap; color: #b7791f; }
+    .rating i { color: #f9b21b; font-size: 0.75rem; }
+    .food-desc { color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1rem; line-height: 1.4; flex: 1; font-weight: 500; }
+    .food-price { font-weight: 900; font-size: 1.25rem; color: var(--primary); margin-bottom: 0.9rem; }
+    .delivery-info { display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem; color: #666; border-top: 1px dashed #e0e0e0; padding-top: 0.9rem; margin-top: auto; font-weight: 500; }
+    .delivery-info i { color: var(--secondary); margin-right: 0.3rem; font-size: 0.8rem; }
+    .add-btn { background: var(--secondary); color: #fff; border: none; padding: 0.65rem 1rem; border-radius: 30px; font-weight: 800; font-size: 0.9rem; cursor: pointer; transition: all 0.2s; margin-top: 0.8rem; display: flex; align-items: center; justify-content: center; gap: 0.4rem; width: 100%; box-shadow: 0 4px 12px rgba(255, 122, 69, 0.25); }
+    .add-btn:hover { background: var(--secondary-dark); transform: scale(1.03); box-shadow: 0 6px 15px rgba(255, 122, 69, 0.4); }
+    .add-btn.added { background: #28a745; box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3); }
+
+    /* FOOTER */
+    .footer { background: #2d2d2d; padding: 3rem 0 1.8rem; margin-top: 3rem; color: #bbb; }
+    .footer-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 2rem; margin-bottom: 2.5rem; }
+    .footer-col h4 { font-size: 1.05rem; font-weight: 700; margin-bottom: 1.2rem; color: #fff; }
+    .footer-col ul { list-style: none; }
+    .footer-col li { margin-bottom: 0.8rem; }
+    .footer-col a { text-decoration: none; color: #aaa; font-size: 0.9rem; transition: color 0.2s; cursor: pointer; }
+    .footer-col a:hover { color: var(--secondary); }
+    .footer-bottom { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; padding-top: 1.8rem; border-top: 1px solid #444; font-size: 0.85rem; color: #888; }
+    .social-icons { display: flex; gap: 1.2rem; }
+    .social-icons a { color: #888; font-size: 1.3rem; transition: all 0.2s; }
+    .social-icons a:hover { color: var(--secondary); transform: translateY(-2px); }
+
+    /* MODALS */
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 300; display: none; align-items: center; justify-content: center; padding: 1rem; backdrop-filter: blur(3px); }
+    .modal-overlay.open { display: flex; }
+    .modal { background: #fff; border-radius: 24px; width: 100%; max-width: 500px; max-height: 85vh; display: flex; flex-direction: column; overflow: hidden; animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
+    @keyframes slideUp { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: translateY(0); } }
+    .modal-header { padding: 1.5rem 1.6rem; border-bottom: 1px solid #f0f0f0; display: flex; justify-content: space-between; align-items: center; }
+    .modal-header h3 { font-size: 1.3rem; font-weight: 800; display: flex; align-items: center; gap: 0.5rem; color: var(--text-main); }
+    .modal-header h3 i { color: var(--primary); }
+    .modal-close { background: #f5f5f5; border: none; width: 36px; height: 36px; border-radius: 50%; font-size: 1.2rem; cursor: pointer; color: #777; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
+    .modal-close:hover { background: #ffe3e3; color: var(--primary); transform: rotate(90deg); }
+    .modal-body { padding: 1.4rem 1.6rem; overflow-y: auto; flex: 1; }
+    
+    .cart-empty { text-align: center; color: #888; padding: 3rem 0; }
+    .cart-empty i { font-size: 4rem; color: #eee; margin-bottom: 1rem; display: block; }
+    .cart-item { display: flex; gap: 1rem; padding: 1.2rem 0; border-bottom: 1px dashed #eee; align-items: center; }
+    .cart-item-img { width: 70px; height: 70px; border-radius: 16px; object-fit: cover; flex-shrink: 0; }
+    .cart-item-info { flex: 1; }
+    .cart-item-info h4 { font-size: 1rem; font-weight: 700; margin-bottom: 0.2rem; color: var(--text-main); }
+    .cart-item-info p { font-size: 0.9rem; color: var(--primary); font-weight: 800; }
+    .qty-controls { display: flex; align-items: center; gap: 0.6rem; margin-top: 0.5rem; }
+    .qty-btn { background: #f5f5f5; border: none; width: 28px; height: 28px; border-radius: 50%; cursor: pointer; font-weight: 800; color: #555; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
+    .qty-btn:hover { background: var(--primary); color: #fff; }
+    .qty-val { font-weight: 800; font-size: 0.95rem; min-width: 20px; text-align: center; }
+    .remove-item { background: none; border: none; color: #ff7875; cursor: pointer; font-size: 1.1rem; padding: 0.5rem; transition: color 0.2s; }
+    .remove-item:hover { color: #d9363e; }
+    .modal-footer { padding: 1.4rem 1.6rem; border-top: 1px solid #f0f0f0; background: #fafafa; border-radius: 0 0 24px 24px; }
+    .cart-total { display: flex; justify-content: space-between; font-weight: 800; font-size: 1.2rem; margin-bottom: 1.2rem; color: var(--text-main); }
+    .cart-total span:last-child { color: var(--primary); }
+    .checkout-btn { background: var(--primary); color: #fff; border: none; padding: 1.1rem; border-radius: 50px; font-weight: 800; font-size: 1.05rem; cursor: pointer; width: 100%; transition: all 0.2s; box-shadow: 0 6px 20px rgba(255, 77, 79, 0.3); }
+    .checkout-btn:hover { background: var(--primary-dark); transform: translateY(-2px); }
+
+    /* LOCATION MODAL SPECIFIC */
+    .location-list { display: flex; flex-direction: column; gap: 0.8rem; margin-top: 0.5rem; }
+    .location-item { display: flex; align-items: center; gap: 1rem; padding: 1.1rem; border: 2px solid #f0f0f0; border-radius: 16px; cursor: pointer; transition: all 0.2s; }
+    .location-item:hover { border-color: #ffe3e3; background: #fff5f5; }
+    .location-item.selected { border-color: var(--primary); background: #fff5f5; box-shadow: 0 0 0 3px rgba(255, 77, 79, 0.1); }
+    .location-item i { color: var(--primary); font-size: 1.5rem; width: 24px; text-align: center; }
+    .location-item-info { flex: 1; }
+    .location-item-info h4 { font-size: 1rem; font-weight: 700; margin-bottom: 0.2rem; color: var(--text-main); }
+    .location-item-info p { font-size: 0.85rem; color: #777; }
+    
+    /* CUSTOM ADDRESS INPUT */
+    .custom-address-container { margin-top: 1rem; display: flex; gap: 0.5rem; }
+    .custom-address-container input { flex: 1; padding: 0.9rem 1rem; border: 2px solid #f0f0f0; border-radius: 14px; font-size: 0.95rem; outline: none; transition: border 0.2s; }
+    .custom-address-container input:focus { border-color: var(--secondary); }
+    .custom-address-container button { background: #f5f5f5; border: none; padding: 0 1.2rem; border-radius: 14px; cursor: pointer; font-weight: 700; color: #555; transition: all 0.2s; }
+    .custom-address-container button:hover { background: var(--secondary); color: #fff; }
+
+    .save-location-btn { margin-top: 1.8rem; width: 100%; background: var(--primary); color: #fff; border: none; padding: 1.1rem; border-radius: 50px; font-weight: 800; font-size: 1.05rem; cursor: pointer; transition: all 0.2s; box-shadow: 0 6px 20px rgba(255, 77, 79, 0.3); }
+    .save-location-btn:hover { background: var(--primary-dark); transform: translateY(-2px); }
+
+    /* AI CHATBOT */
+    .chatbot-toggle { position: fixed; bottom: 30px; right: 30px; background: var(--primary); color: #fff; border: none; width: 65px; height: 65px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2rem; cursor: pointer; box-shadow: 0 10px 30px rgba(255, 77, 79, 0.5); transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); z-index: 200; }
+    .chatbot-toggle:hover { background: var(--primary-dark); transform: scale(1.1) rotate(10deg); }
+    .chatbot-container { position: fixed; bottom: 110px; right: 30px; width: 380px; max-width: calc(100vw - 40px); background: #fff; border-radius: 28px; box-shadow: 0 25px 60px -15px rgba(0,0,0,0.3); display: flex; flex-direction: column; overflow: hidden; z-index: 200; border: 1px solid #f0eef0; opacity: 0; visibility: hidden; transform: translateY(30px); transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+    .chatbot-container.open { opacity: 1; visibility: visible; transform: translateY(0); }
+    .chat-header { background: var(--primary); color: #fff; padding: 1.3rem 1.5rem; display: flex; align-items: center; justify-content: space-between; }
+    .chat-header h3 { font-size: 1.15rem; font-weight: 800; display: flex; align-items: center; gap: 0.5rem; }
+    .chat-close { background: rgba(255,255,255,0.2); border: none; color: #fff; width: 32px; height: 32px; border-radius: 50%; font-size: 1.1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.2s; }
+    .chat-close:hover { background: rgba(255,255,255,0.4); }
+    .chat-messages { padding: 1.4rem; height: 320px; overflow-y: auto; display: flex; flex-direction: column; gap: 1rem; background: #fafafa; }
+    .message { max-width: 88%; padding: 0.9rem 1.1rem; border-radius: 20px; font-size: 0.95rem; line-height: 1.5; word-wrap: break-word; animation: fadeIn 0.3s ease; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    .message.bot { background: #fff; border: 1px solid #eee; align-self: flex-start; border-bottom-left-radius: 6px; box-shadow: 0 2px 10px rgba(0,0,0,0.02); color: #333; }
+    .message.user { background: var(--primary); color: #fff; align-self: flex-end; border-bottom-right-radius: 6px; box-shadow: 0 4px 12px rgba(255, 77, 79, 0.2); }
+    .message .food-tag { display: inline-block; background: #fff0f0; color: var(--primary); padding: 0.2rem 0.7rem; border-radius: 20px; font-size: 0.8rem; font-weight: 700; margin: 0.4rem 0.3rem 0 0; }
+    .chat-input-area { display: flex; padding: 1rem 1.2rem; background: #fff; border-top: 1px solid #f0f0f0; gap: 0.6rem; }
+    .chat-input-area input { flex: 1; padding: 0.8rem 1.2rem; border: 2px solid #f0f0f0; border-radius: 40px; font-size: 0.95rem; outline: none; background: #fafafa; transition: all 0.2s; }
+    .chat-input-area input:focus { border-color: var(--secondary); background: #fff; }
+    .chat-input-area button { background: var(--secondary); border: none; color: #fff; width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 1.1rem; flex-shrink: 0; transition: background 0.2s; box-shadow: 0 4px 12px rgba(255, 122, 69, 0.3); }
+    .chat-input-area button:hover { background: var(--secondary-dark); transform: scale(1.05); }
+    .quick-replies { display: flex; flex-wrap: wrap; gap: 0.6rem; padding: 0.8rem 1.2rem 1.2rem; background: #fafafa; }
+    .quick-reply { background: #fff; border: 1px solid #e0e0e0; border-radius: 40px; padding: 0.5rem 1.1rem; font-size: 0.8rem; cursor: pointer; transition: all 0.2s; font-weight: 600; color: #555; }
+    .quick-reply:hover { border-color: var(--primary); background: #fff5f5; color: var(--primary); transform: translateY(-2px); }
+
+    /* FOOD DETAIL MODAL */
+    .food-detail-modal { background: #fff; border-radius: 28px; width: 100%; max-width: 560px; max-height: 90vh; overflow-y: auto; animation: slideUp 0.3s ease; }
+    .food-detail-img { width: 100%; height: 280px; object-fit: cover; }
+    .food-detail-body { padding: 2rem; }
+    .food-detail-body h2 { font-size: 1.8rem; font-weight: 900; margin-bottom: 0.6rem; color: var(--text-main); }
+    .food-detail-body .desc { color: #555; line-height: 1.7; margin: 1.2rem 0; font-size: 1rem; }
+    .food-detail-body .price-big { font-size: 2rem; font-weight: 900; color: var(--primary); margin-bottom: 1.2rem; }
+    .food-detail-meta { display: flex; gap: 1rem; margin-bottom: 1.5rem; flex-wrap: wrap; }
+    .food-detail-meta span { background: #fff5f5; padding: 0.5rem 1.1rem; border-radius: 30px; font-size: 0.9rem; font-weight: 700; display: flex; align-items: center; gap: 0.4rem; color: var(--primary); }
+    .reviews-section { margin-top: 2rem; border-top: 2px dashed #f0f0f0; padding-top: 1.5rem; }
+    .reviews-section h3 { font-size: 1.15rem; margin-bottom: 1.2rem; color: var(--text-main); }
+    .review-item { background: #fafafa; border-radius: 16px; padding: 1.1rem; margin-bottom: 1rem; border: 1px solid #f0f0f0; }
+    .review-item .reviewer { font-weight: 800; font-size: 0.95rem; margin-bottom: 0.4rem; display: flex; justify-content: space-between; color: var(--text-main); }
+    .review-item .reviewer .stars { color: #f9b21b; font-size: 0.9rem; }
+    .review-item p { font-size: 0.9rem; color: #555; line-height: 1.5; }
+
+    /* TOAST */
+    .toast { position: fixed; bottom: 120px; left: 50%; transform: translateX(-50%) translateY(30px); background: #28a745; color: #fff; padding: 1rem 2rem; border-radius: 50px; font-weight: 800; font-size: 1rem; box-shadow: 0 10px 30px rgba(40, 167, 69, 0.3); opacity: 0; visibility: hidden; transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); z-index: 500; display: flex; align-items: center; gap: 0.6rem; }
+    .toast.show { opacity: 1; visibility: visible; transform: translateX(-50%) translateY(0); }
+
+    /* CHECKOUT */
+    .checkout-summary { text-align: center; padding: 2rem 0; }
+    .checkout-summary i { font-size: 5rem; color: #28a745; margin-bottom: 1.5rem; animation: scaleIn 0.5s ease; }
+    @keyframes scaleIn { 0% { transform: scale(0); } 80% { transform: scale(1.1); } 100% { transform: scale(1); } }
+    .checkout-summary h3 { font-size: 1.8rem; margin-bottom: 0.8rem; color: var(--text-main); }
+    .checkout-summary p { color: #666; margin-bottom: 1.5rem; font-size: 1.05rem; line-height: 1.6; }
+
+    /* RESPONSIVE */
+    @media (max-width: 900px) {
+      .hero-text h1 { font-size: 2.6rem; }
+      .sub-nav { justify-content: flex-start; padding-left: 1rem; }
+    }
+    @media (max-width: 768px) {
+      .nav-container { flex-direction: column; align-items: stretch; }
+      .search-area { max-width: 100%; order: 4; }
+      .location-bar { margin-left: 0; justify-content: center; margin-top: 0.5rem; max-width: 100%; }
+      .nav-icons { justify-content: flex-end; }
+      .hero { flex-direction: column; padding: 0; }
+      .hero-text { padding: 2.5rem 1.8rem; text-align: center; }
+      .hero-text h1 { font-size: 2.4rem; }
+      .hero-text p { margin: 1rem auto 1.8rem; }
+      .hero-cta { margin: 0 auto; }
+      .hero-image-container { min-height: 250px; border-radius: 0 0 30px 30px; }
+      .section-header h2 { font-size: 1.6rem; }
+      .chatbot-container { right: 16px; bottom: 100px; width: calc(100vw - 32px); }
+      .chatbot-toggle { bottom: 20px; right: 20px; width: 60px; height: 60px; font-size: 1.8rem; }
+    }
+    @media (max-width: 480px) {
+      .container { padding: 0 1rem; }
+      .logo-img { width: 44px; height: 44px; }
+      .hero-text h1 { font-size: 2rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ========== HEADER ========== -->
+  <header class="navbar">
+    <div class="container nav-container">
+      <div style="display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;">
+        <div class="logo" onclick="window.scrollTo({top:0,behavior:'smooth'})">
+          <img class="logo-img" src="https://images.unsplash.com/photo-1562967914-608f82629710?w=100&h=100&fit=crop&crop=center" alt="Mr. Speedy logo" onerror="this.src='https://images.unsplash.com/photo-1626645738196-c2a7c87a8f58?w=100&h=100&fit=crop&crop=center'">
+          <span>Mr. Speedy</span>
+        </div>
+        
+        <div class="location-bar" onclick="openLocationModal()">
+          <i class="fas fa-map-marker-alt"></i>
+          <span id="currentLocationLabel">Set Delivery Address</span>
+          <i class="fas fa-chevron-down"></i>
+        </div>
+      </div>
+
+      <div class="search-area">
+        <i class="fas fa-search"></i>
+        <input type="text" id="searchInput" placeholder="Search for dishes...">
+        <button id="searchBtn">Find food</button>
+      </div>
+
+      <div class="nav-icons">
+        <button onclick="openCart()">
+          <i class="fas fa-shopping-bag"></i> Cart
+          <span class="cart-badge" id="cartBadge">0</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ========== SECONDARY NAVIGATION ========== -->
+  <nav class="sub-nav">
+    <a href="#" class="active" onclick="handleNavClick(this, 'all'); return false;"><i class="fas fa-home"></i> Home</a>
+    <a href="#" onclick="handleNavClick(this, 'deals'); return false;"><i class="fas fa-tags"></i> Deals</a>
+    <a href="#" onclick="handleNavClick(this, 'fast'); return false;"><i class="fas fa-bolt"></i> Fast Delivery</a>
+  </nav>
+
+  <main class="container">
+    <!-- HERO -->
+    <section class="hero">
+      <div class="hero-text">
+        <h1>Hungry? <span class="highlight">Order</span> from Mr. Speedy</h1>
+        <p>Lightning-fast delivery · Real best-selling dishes from top restaurants. Freshly cooked and delivered hot to your door.</p>
+        <button class="hero-cta" onclick="document.querySelector('.categories').scrollIntoView({behavior:'smooth'})">
+          <i class="fas fa-bolt"></i> Order now
+        </button>
+      </div>
+      <div class="hero-image-container">
+        <img class="carousel-slide active" src="https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=1000&h=800&fit=crop&crop=center" alt="Grilled food spread">
+        <img class="carousel-slide" src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=1000&h=800&fit=crop&crop=center" alt="Delicious table spread">
+        <img class="carousel-slide" src="https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=1000&h=800&fit=crop&crop=center" alt="Fresh pizza">
+      </div>
+    </section>
+
+    <!-- CATEGORIES -->
+    <div class="categories" id="categoryBar">
+      <div class="category-pill active" data-cat="all"><i class="fas fa-utensils"></i> All</div>
+      <div class="category-pill" data-cat="chicken"><i class="fas fa-drumstick-bite"></i> Chicken</div>
+      <div class="category-pill" data-cat="burger"><i class="fas fa-hamburger"></i> Burgers</div>
+      <div class="category-pill" data-cat="japanese"><i class="fas fa-fish"></i> Sushi & Ramen</div>
+      <div class="category-pill" data-cat="breakfast"><i class="fas fa-mug-hot"></i> Breakfast</div>
+      <div class="category-pill" data-cat="vegan"><i class="fas fa-leaf"></i> Vegan</div>
+      <div class="category-pill" data-cat="dessert"><i class="fas fa-birthday-cake"></i> Desserts</div>
+      <div class="category-pill" data-cat="mexican"><i class="fas fa-pepper-hot"></i> Mexican</div>
+      <div class="category-pill" data-cat="pizza"><i class="fas fa-pizza-slice"></i> Pizza</div>
+      <div class="category-pill" data-cat="filipino"><i class="fas fa-utensil-spoon"></i> Filipino</div>
+      <div class="category-pill" data-cat="fastfood"><i class="fas fa-hamburger"></i> Fast Food</div>
+    </div>
+
+    <!-- BEST SELLERS -->
+    <div class="section-header">
+      <h2>🔥 Best sellers near you</h2>
+      <a onclick="resetFilter()">See all <i class="fas fa-arrow-right"></i></a>
+    </div>
+    <div class="food-grid" id="bestSellersGrid"></div>
+
+    <!-- TOP RATED -->
+    <div class="section-header">
+      <h2>⭐ Top rated this week</h2>
+      <a onclick="resetFilter()">See all <i class="fas fa-arrow-right"></i></a>
+    </div>
+    <div class="food-grid" id="topRatedGrid"></div>
+
+    <!-- NO RESULTS -->
+    <div id="noResults" style="display:none; text-align:center; padding:4rem 0; color:#888;">
+      <i class="fas fa-search" style="font-size:4rem; margin-bottom:1.5rem; display:block; color:#ffccd5;"></i>
+      <h3 style="font-size: 1.5rem; color: var(--text-main); margin-bottom: 0.5rem;">No dishes found</h3>
+      <p>Try a different search or category!</p>
+    </div>
+  </main>
+
+  <!-- ========== FOOTER ========== -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-col">
+          <h4>Mr. Speedy</h4>
+          <ul>
+            <li><a onclick="showToast('About us page coming soon!')">About us</a></li>
+            <li><a onclick="showToast('Careers page coming soon!')">Careers</a></li>
+            <li><a onclick="showToast('Blog coming soon!')">Blog</a></li>
+            <li><a onclick="showToast('Press page coming soon!')">Press</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>For customers</h4>
+          <ul>
+            <li><a onclick="showToast('Help center opening...')">Help center</a></li>
+            <li><a onclick="showToast('Tracking orders...')">Order tracking</a></li>
+            <li><a onclick="showToast('FAQs coming soon!')">FAQs</a></li>
+            <li><a onclick="showToast('Privacy policy opening...')">Privacy policy</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>For restaurants</h4>
+          <ul>
+            <li><a onclick="showToast('Partner portal coming soon!')">Partner with us</a></li>
+            <li><a onclick="showToast('Restaurant login opening...')">Restaurant login</a></li>
+            <li><a onclick="showToast('Pricing page coming soon!')">Pricing</a></li>
+          </ul>
+        </div>
+        <div class="footer-col">
+          <h4>Follow us</h4>
+          <div class="social-icons" style="margin-top: 0.5rem;">
+            <a href="#" onclick="showToast('Facebook opening...'); return false;"><i class="fab fa-facebook-f"></i></a>
+            <a href="#" onclick="showToast('Instagram opening...'); return false;"><i class="fab fa-instagram"></i></a>
+            <a href="#" onclick="showToast('Twitter opening...'); return false;"><i class="fab fa-twitter"></i></a>
+            <a href="#" onclick="showToast('YouTube opening...'); return false;"><i class="fab fa-youtube"></i></a>
+          </div>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>© 2025 Mr. Speedy – demo. Food photos via Unsplash.</span>
+        <span style="display: flex; gap: 1.5rem;">
+          <a onclick="showToast('Terms page coming soon!')" style="color:#aaa; text-decoration: none; cursor: pointer;">Terms</a>
+          <a onclick="showToast('Privacy page coming soon!')" style="color:#aaa; text-decoration: none; cursor: pointer;">Privacy</a>
+          <a onclick="showToast('Cookie settings opening...')" style="color:#aaa; text-decoration: none; cursor: pointer;">Cookies</a>
+        </span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ========== LOCATION MODAL ========== -->
+  <div class="modal-overlay" id="locationModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3><i class="fas fa-map-marker-alt"></i> Delivery Address</h3>
+        <button class="modal-close" onclick="closeLocationModal()"><i class="fas fa-times"></i></button>
+      </div>
+      <div class="modal-body">
+        <p style="margin-bottom: 1.2rem; color:#666; font-size: 0.95rem;">Where should we deliver your food?</p>
+        
+        <div class="location-list">
+          <div class="location-item" id="loc-Home" onclick="selectLocation('Home', '123 Mabini St, Makati City')">
+            <i class="fas fa-home"></i>
+            <div class="location-item-info">
+              <h4>Home</h4>
+              <p>123 Mabini St, Makati City</p>
+            </div>
+          </div>
+          <div class="location-item" id="loc-Work" onclick="selectLocation('Work', 'Ayala Tower 1, Makati CBD')">
+            <i class="fas fa-building"></i>
+            <div class="location-item-info">
+              <h4>Work</h4>
+              <p>Ayala Tower 1, Makati CBD</p>
+            </div>
+          </div>
+          <div class="location-item" id="loc-Gym" onclick="selectLocation('Gym', 'Fitness First, BGC')">
+            <i class="fas fa-dumbbell"></i>
+            <div class="location-item-info">
+              <h4>Gym</h4>
+              <p>Fitness First, BGC</p>
+            </div>
+          </div>
+        </div>
+
+        <div style="margin-top: 1.8rem; border-top: 2px dashed #f0f0f0; padding-top: 1.2rem;">
+          <p style="margin-bottom: 0.8rem; color:#666; font-size: 0.95rem;">Or enter a new address:</p>
+          <div class="custom-address-container">
+            <input type="text" id="customAddressInput" placeholder="e.g., 456 BGC High Street">
+            <button onclick="setCustomAddress()">Set</button>
+          </div>
+        </div>
+
+        <button class="save-location-btn" onclick="saveLocation()">Confirm Address</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== CART MODAL ========== -->
+  <div class="modal-overlay" id="cartModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3><i class="fas fa-shopping-bag"></i> Your Cart</h3>
+        <button class="modal-close" onclick="closeCart()"><i class="fas fa-times"></i></button>
+      </div>
+      <div class="modal-body" id="cartBody"></div>
+      <div class="modal-footer" id="cartFooter" style="display:none;">
+        <div class="cart-total">
+          <span>Total:</span>
+          <span id="cartTotal">₱0</span>
+        </div>
+        <button class="checkout-btn" onclick="checkout()"><i class="fas fa-check-circle"></i> Place Order</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== FOOD DETAIL MODAL ========== -->
+  <div class="modal-overlay" id="foodDetailModal">
+    <div class="food-detail-modal" id="foodDetailContent"></div>
+  </div>
+
+  <!-- ========== TOAST ========== -->
+  <div class="toast" id="toast"><i class="fas fa-check-circle"></i> <span id="toastText"></span></div>
+
+  <!-- ========== AI CHATBOT ========== -->
+  <button class="chatbot-toggle" id="chatbotToggle" aria-label="Open AI assistant">
+    <i class="fas fa-robot"></i>
+  </button>
+
+  <div class="chatbot-container" id="chatbotContainer">
+    <div class="chat-header">
+      <h3><i class="fas fa-robot"></i> Mr. Speedy AI</h3>
+      <button class="chat-close" onclick="closeChat()"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="chat-messages" id="chatMessages">
+      <div class="message bot">👋 Hi! I'm Mr. Speedy AI — your food assistant. Ask me for recommendations, reviews, or anything about the best sellers!</div>
+    </div>
+    <div class="quick-replies">
+      <div class="quick-reply" data-msg="What's the best seller?">Best seller?</div>
+      <div class="quick-reply" data-msg="Recommend something for me">Recommend</div>
+      <div class="quick-reply" data-msg="Show me reviews">Reviews</div>
+      <div class="quick-reply" data-msg="What's cheap?">Cheap eats</div>
+      <div class="quick-reply" data-msg="Spicy food please">Spicy</div>
+    </div>
+    <div class="chat-input-area">
+      <input type="text" id="chatInput" placeholder="Ask me anything about food...">
+      <button onclick="sendMessage(chatInput.value)"><i class="fas fa-paper-plane"></i></button>
+    </div>
+  </div>
+
+  <script>
+    /* ========== HERO IMAGE CAROUSEL LOGIC ========== */
+    let currentSlide = 0;
+    const slides = document.querySelectorAll('.carousel-slide');
+    
+    function nextSlide() {
+      slides[currentSlide].classList.remove('active');
+      currentSlide = (currentSlide + 1) % slides.length;
+      slides[currentSlide].classList.add('active');
+    }
+    setInterval(nextSlide, 4000);
+
+    /* ========== EXPANDED FOOD DATABASE (Real Menu Items with matched images) ========== */
+    const foodDB = [
+      // --- MANG INASAL (Real Items) ---
+      { id: 101, name: "Mang Inasal Paa Large (1 Rice)", price: 149, rating: 4.8, desc: "Signature Chicken Inasal Paa (leg quarter) grilled with annatto oil, served with rice and spiced vinegar.", cat: "filipino", tags: ["mang inasal","chicken","inasal","grilled","filipino"], img: "https://images.unsplash.com/photo-1598515214211-89d3c73ae83b?w=800&h=600&fit=crop&crop=center", badge: "Filipino Favorite", bestSeller: true, delivery: "20–30 min", fee: "₱39 delivery", reviews: [{user:"Jose M.", stars:5, text:"The classic Mang Inasal taste. Sarap!"}] },
+      { id: 102, name: "Mang Inasal Pecho Large (1 Rice)", price: 174, rating: 4.8, desc: "Juicy Chicken Inasal Pecho (breast) grilled to perfection, served with rice and spiced vinegar.", cat: "filipino", tags: ["mang inasal","chicken","inasal","pecho","filipino"], img: "https://images.unsplash.com/photo-1598515214211-89d3c73ae83b?w=800&h=600&fit=crop&crop=center", badge: null, bestSeller: false, delivery: "20–30 min", fee: "₱39 delivery", reviews: [{user:"Maria L.", stars:5, text:"Juicy and flavorful. Love the chicken oil!"}] },
+      { id: 103, name: "Mang Inasal Pork BBQ (2 pcs)", price: 118, rating: 4.7, desc: "Two sticks of sweet and savory grilled pork barbecue, served with spiced vinegar.", cat: "filipino", tags: ["mang inasal","pork","bbq","grilled","filipino"], img: "https://images.unsplash.com/photo-1529193591184-b1d58069ecdd?w=800&h=600&fit=crop&crop=center", badge: null, bestSeller: false, delivery: "20–30 min", fee: "₱29 delivery", reviews: [{user:"Carlo P.", stars:5, text:"Perfectly grilled. The marinade is delicious."}] },
+      { id: 104, name: "Mang Inasal Extra Creamy Halo-Halo", price: 113, rating: 4.9, desc: "A delightful blend of milk and ice, topped with classic halo-halo favorites like ube, leche flan, and sweet beans.", cat: "dessert", tags: ["mang inasal","halo-halo","dessert","sweet","filipino"], img: "https://images.unsplash.com/photo-1551024601-bec78aea704b?w=800&h=600&fit=crop&crop=center", badge: "Filipino Favorite", bestSeller: true, delivery: "15–25 min", fee: "₱29 delivery", reviews: [{user:"Bea A.", stars:5, text:"Creamy and refreshing! The perfect ending to a meal."}] },
+
+      // --- CHOWKING (Real Items) ---
+      { id: 201, name: "Chowking Siomai Chao Fan", price: 116, rating: 4.6, desc: "Wok-sarap fried rice with meat, egg, and kangkong leaves, topped with 4 pieces of siomai.", cat: "fastfood", tags: ["chowking","chao fan","siomai","rice","chinese"], img: "https://images.unsplash.com/photo-1603133872878-684f208fb84b?w=800&h=600&fit=crop&crop=center", badge: "Bestseller", bestSeller: true, delivery: "15–25 min", fee: "₱39 delivery", reviews: [{user:"Kevin C.", stars:5, text:"The wok flavor is amazing. Siomai is a must!"}] },
+      { id: 202, name: "Chowking Chinese-Style Fried Chicken Lauriat", price: 233, rating: 4.7, desc: "Crunchy Chinese-style fried chicken served with egg fried rice, pancit, siomai, and buchi.", cat: "fastfood", tags: ["chowking","fried chicken","lauriat","chinese"], img: "https://images.unsplash.com/photo-1562967914-608f82629710?w=800&h=600&fit=crop&crop=center", badge: "Complete Meal", bestSeller: true, delivery: "20–30 min", fee: "₱49 delivery", reviews: [{user:"Sarah L.", stars:5, text:"A complete feast! Love the variety in the lauriat."}] },
+      { id: 203, name: "Chowking Sweet & Sour Pork", price: 180, rating: 4.5, desc: "Tender pork slices in a signature sweet and sour sauce with bell peppers, red onions, and pineapple.", cat: "fastfood", tags: ["chowking","sweet and sour","pork","chinese"], img: "https://images.unsplash.com/photo-1546549032-9571cd6b27df?w=800&h=600&fit=crop&crop=center", badge: null, bestSeller: false, delivery: "20–30 min", fee: "₱39 delivery", reviews: [{user:"Mark R.", stars:4, text:"Classic sweet and sour. The sauce is perfect."}] },
+      { id: 204, name: "Chowking Beef Chao Fan", price: 150, rating: 4.7, desc: "Mas beefy, mas pinasarap! Wok-sarap fried rice with tender beef strips and vegetables.", cat: "fastfood", tags: ["chowking","beef","chao fan","rice","chinese"], img: "https://images.unsplash.com/photo-1512058564366-18510be2db19?w=800&h=600&fit=crop&crop=center", badge: null, bestSeller: false, delivery: "15–25 min", fee: "₱39 delivery", reviews: [{user:"Ella M.", stars:5, text:"So much beef! Very filling and flavorful."}] },
+
+      // --- KFC (Real Items) ---
+      { id: 301, name: "KFC 1-PC Chicken Meal with Soup", price: 205, rating: 4.7, desc: "One piece of KFC's Original Recipe or Hot & Crispy chicken, served with rice, soup, and a drink.", cat: "fastfood", tags: ["kfc","chicken","fried chicken","meal"], img: "https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?w=800&h=600&fit=crop&crop=center", badge: "Classic", bestSeller: true, delivery: "15–25 min", fee: "₱39 delivery", reviews: [{user:"James O.", stars:5, text:"Finger lickin' good! The soup is a nice touch."}] },
+      { id: 302, name: "KFC Zinger Steak Ala Carte", price: 155, rating: 4.8, desc: "Crispy chicken fillet drenched in rich Ala King sauce, served on a bed of butter rice.", cat: "fastfood", tags: ["kfc","zinger","steak","ala king","chicken"], img: "https://images.unsplash.com/photo-1615297928064-24977384d0da?w=800&h=600&fit=crop&crop=center", badge: "Popular", bestSeller: true, delivery: "15–25 min", fee: "₱39 delivery", reviews: [{user:"Nicole P.", stars:5, text:"The Ala King sauce is so creamy and rich. Love it!"}] },
+      { id: 303, name: "KFC Famous Bowl", price: 90, rating: 4.6, desc: "KFC's snack favorite: creamy mashed potatoes, corn, crispy chicken bites, and gravy all in one bowl.", cat: "fastfood", tags: ["kfc","famous bowl","chicken","mashed potato"], img: "https://images.unsplash.com/photo-1547592180-85f173990554?w=800&h=600&fit=crop&crop=center", badge: null, bestSeller: false, delivery: "10–20 min", fee: "₱29 delivery", reviews: [{user:"David K.", stars:4, text:"Comfort food in a bowl. The gravy makes it."}] },
+      { id: 304, name: "KFC 8-PC Bucket Combo", price: 925, rating: 4.9, desc: "8 pieces of KFC chicken (Original Recipe or Hot & Crispy), 4 rice, 4 sides, and 4 drinks. Perfect for sharing!", cat: "fastfood", tags: ["kfc","bucket","chicken","family","sharing"], img: "https://images.unsplash.com/photo-1562967914-608f82629710?w=800&h=600&fit=crop&crop=center", badge: "Family Size", bestSeller: true, delivery: "20–30 min", fee: "₱49 delivery", reviews: [{user:"Chris E.", stars:5, text:"The ultimate family meal. Everyone loves it!"}] },
+
+      // --- OTHER FILIPINO FAVORITES ---
+      { id: 27, name: "Pork Sisig", price: 250, rating: 4.9, desc: "Sizzling chopped pork jowl and liver, seasoned with calamansi, chili, and onions. Served on a hot plate.", cat: "filipino", tags: ["sisig","pork","filipino","spicy","sizzling"], img: "https://images.unsplash.com/photo-1625937286074-9ca519d5d9df?w=800&h=600&fit=crop&crop=center", badge: "Filipino Classic", bestSeller: true, delivery: "20–30 min", fee: "₱39 delivery", reviews: [{user:"Aiza S.", stars:5, text:"The best sisig! Perfectly crispy and spicy."}] },
+      { id: 32, name: "Sinigang na Baboy", price: 280, rating: 4.8, desc: "Sour pork soup with tamarind, kangkong, radish, and tomatoes. Perfect for rainy days.", cat: "filipino", tags: ["sinigang","soup","pork","filipino","sour"], img: "https://images.unsplash.com/photo-1547592180-85f173990554?w=800&h=600&fit=crop&crop=center", badge: "Comfort Food", bestSeller: true, delivery: "25–35 min", fee: "₱49 delivery", reviews: [{user:"Nena R.", stars:5, text:"Sobrang sarap ng sabaw! Just the right amount of sourness."}] },
+      { id: 33, name: "Kare-Kare", price: 320, rating: 4.7, desc: "Oxtail stew in a thick peanut sauce, served with bagoong (shrimp paste) and fresh vegetables.", cat: "filipino", tags: ["kare-kare","peanut","oxtail","filipino","stew"], img: "https://images.unsplash.com/photo-1547592180-85f173990554?w=800&h=600&fit=crop&crop=center", badge: null, bestSeller: false, delivery: "25–35 min", fee: "₱49 delivery", reviews: [{user:"Carlo M.", stars:5, text:"Rich peanut sauce, tender oxtail. Perfect with bagoong!"}] },
+
+      // --- OTHER EXISTING FAVORITES ---
+      { id: 1, name: "Jollibee Chickenjoy (2pcs)", price: 175, rating: 4.9, desc: "Crispylicious, juicylicious fried chicken with gravy and rice. The Philippines' #1 fried chicken.", cat: "chicken", tags: ["chicken","fried","rice","jollibee","best seller","cheap"], img: "https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?w=800&h=600&fit=crop&crop=center", badge: "#1 Best Seller", bestSeller: true, delivery: "15–25 min", fee: "Free delivery", reviews: [{user:"Maria S.", stars:5, text:"Sobrang sarap! Perfectly cooked and delivered hot."}] },
+      { id: 2, name: "Burger King Whopper", price: 220, rating: 4.7, desc: "Flame-grilled 1/4 lb beef patty, fresh tomatoes, lettuce, mayo, ketchup, pickles, and onions.", cat: "burger", tags: ["burger","whopper","beef","american"], img: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=800&h=600&fit=crop&crop=center", badge: null, bestSeller: true, delivery: "15–25 min", fee: "₱29 delivery", reviews: [{user:"Carlos M.", stars:5, text:"Flame-grilled perfection. Tastes fresh every time."}] },
+      { id: 3, name: "Sushi Zen Salmon Roll", price: 380, rating: 4.9, desc: "Fresh Norwegian salmon, cream cheese, cucumber, and avocado wrapped in sushi rice and nori.", cat: "japanese", tags: ["sushi","salmon","japanese","healthy"], img: "https://images.unsplash.com/photo-1579584425555-c3ce17fd4351?w=800&h=600&fit=crop&crop=center", badge: null, bestSeller: true, delivery: "25–35 min", fee: "₱49 delivery", reviews: [{user:"Kenji T.", stars:5, text:"Fresh salmon, great texture. Authentic taste!"}] },
+      { id: 4, name: "Morning Brew Buttermilk Pancakes", price: 195, rating: 4.8, desc: "Fluffy buttermilk pancakes served with maple syrup, butter, and fresh strawberries.", cat: "breakfast", tags: ["pancakes","breakfast","sweet","morning"], img: "https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=800&h=600&fit=crop&crop=center", badge: "New", bestSeller: true, delivery: "10–20 min", fee: "Free delivery", reviews: [{user:"Emma L.", stars:5, text:"So fluffy! The strawberries were fresh."}] },
+      { id: 6, name: "Green Bowl Buddha Bowl", price: 260, rating: 4.8, desc: "Quinoa, roasted chickpeas, avocado, kale, cherry tomatoes, and tahini dressing.", cat: "vegan", tags: ["vegan","healthy","salad","bowl","vegetarian"], img: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=800&h=600&fit=crop&crop=center", badge: null, bestSeller: true, delivery: "15–25 min", fee: "Free delivery", reviews: [{user:"Olivia H.", stars:5, text:"Fresh ingredients, generous portion. Love the tahini!"}] },
+      { id: 7, name: "Noodle House Tonkotsu Ramen", price: 320, rating: 4.8, desc: "Rich pork bone broth, chashu pork, soft-boiled egg, bamboo shoots, and green onions.", cat: "japanese", tags: ["ramen","noodles","japanese","soup","pork"], img: "https://images.unsplash.com/photo-1569718212165-3a8278d5f624?w=800&h=600&fit=crop&crop=center", badge: "Popular", bestSeller: false, delivery: "20–30 min", fee: "₱39 delivery", reviews: [{user:"Hiro N.", stars:5, text:"Rich and creamy broth. Tastes like Japan!"}] },
+      { id: 9, name: "Sugar & Spice Red Velvet Cake", price: 210, rating: 4.9, desc: "Moist red velvet layers with cream cheese frosting, topped with red velvet crumbs.", cat: "dessert", tags: ["cake","dessert","sweet","red velvet"], img: "https://images.unsplash.com/photo-1586985289688-ca3cf47d3e6e?w=800&h=600&fit=crop&crop=center", badge: null, bestSeller: false, delivery: "10–20 min", fee: "Free delivery", reviews: [{user:"Grace F.", stars:5, text:"The best red velvet I've ever had. So moist!"}] }
+    ];
+
+    /* ========== STATE & INIT ========== */
+    let cart = JSON.parse(localStorage.getItem('mrspeedy_cart') || '[]');
+    let currentCategory = 'all';
+    let currentSearch = '';
+    let selectedLocation = { name: 'Set Delivery Address', address: '' };
+    let tempLocation = { name: '', address: '' };
+
+    const savedLoc = localStorage.getItem('mrspeedy_location');
+    if (savedLoc) {
+      selectedLocation = JSON.parse(savedLoc);
+      updateLocationUI();
+    }
+
+    /* ========== LOCATION LOGIC ========== */
+    function updateLocationUI() {
+      const label = document.getElementById('currentLocationLabel');
+      if (selectedLocation.address) {
+        label.textContent = `${selectedLocation.name} - ${selectedLocation.address}`;
+      } else {
+        label.textContent = 'Set Delivery Address';
+      }
+    }
+
+    function openLocationModal() {
+      tempLocation = { ...selectedLocation };
+      document.querySelectorAll('.location-item').forEach(el => el.classList.remove('selected'));
+      if (tempLocation.name) {
+        const match = document.getElementById(`loc-${tempLocation.name}`);
+        if (match) match.classList.add('selected');
+      }
+      document.getElementById('customAddressInput').value = '';
+      document.getElementById('locationModal').classList.add('open');
+    }
+
+    function closeLocationModal() {
+      document.getElementById('locationModal').classList.remove('open');
+    }
+
+    function selectLocation(name, address) {
+      document.querySelectorAll('.location-item').forEach(el => el.classList.remove('selected'));
+      const target = document.getElementById(`loc-${name}`);
+      if (target) target.classList.add('selected');
+      tempLocation = { name, address };
+      document.getElementById('customAddressInput').value = '';
+    }
+
+    function setCustomAddress() {
+      const val = document.getElementById('customAddressInput').value.trim();
+      if (!val) {
+        showToast('Please enter a valid address.');
+        return;
+      }
+      document.querySelectorAll('.location-item').forEach(el => el.classList.remove('selected'));
+      tempLocation = { name: 'Custom', address: val };
+      showToast('Custom address selected. Click Confirm to save.');
+    }
+
+    function saveLocation() {
+      if (!tempLocation.address) {
+        showToast('Please select or enter a location first.');
+        return;
+      }
+      selectedLocation = { ...tempLocation };
+      localStorage.setItem('mrspeedy_location', JSON.stringify(selectedLocation));
+      updateLocationUI();
+      closeLocationModal();
+      
+      showToast(`Address updated to ${selectedLocation.name}. Recalculating delivery times...`);
+      
+      if (selectedLocation.name === 'Work' || selectedLocation.address.toLowerCase().includes('ayala')) {
+        setTimeout(() => showToast('📍 Promo applied: Free delivery for orders above ₱500 in Makati CBD!'), 1500);
+      } else if (selectedLocation.name === 'Home' || selectedLocation.address.toLowerCase().includes('mabini')) {
+        setTimeout(() => showToast('📍 Promo applied: Free delivery on your first order!'), 1500);
+      }
+    }
+
+    /* ========== NAVIGATION LOGIC ========== */
+    function handleNavClick(element, type) {
+      document.querySelectorAll('.sub-nav a').forEach(a => a.classList.remove('active'));
+      element.classList.add('active');
+
+      if (type === 'all') {
+        resetFilter();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } else if (type === 'deals') {
+        resetFilter();
+        document.querySelectorAll('.category-pill').forEach(p => p.classList.remove('active'));
+        currentSearch = 'cheap';
+        renderFoods();
+        document.querySelector('.section-header').scrollIntoView({ behavior: 'smooth' });
+        showToast('Showing deals and value meals!');
+      } else if (type === 'fast') {
+        resetFilter();
+        const fastItems = foodDB.filter(f => parseInt(f.delivery.split('–')[1]) <= 25);
+        document.getElementById('bestSellersGrid').innerHTML = fastItems.map(createFoodCard).join('');
+        document.getElementById('topRatedGrid').innerHTML = '';
+        document.getElementById('noResults').style.display = 'none';
+        document.querySelector('.section-header').scrollIntoView({ behavior: 'smooth' });
+        showToast('Showing fastest delivery options (under 25 mins)');
+      }
+    }
+
+    /* ========== CART FUNCTIONS ========== */
+    function saveCart() {
+      localStorage.setItem('mrspeedy_cart', JSON.stringify(cart));
+      updateCartBadge();
+    }
+    function updateCartBadge() {
+      const total = cart.reduce((s, i) => s + i.qty, 0);
+      document.getElementById('cartBadge').textContent = total;
+    }
+    function addToCart(id, e) {
+      if (e) e.stopPropagation();
+      const food = foodDB.find(f => f.id === id);
+      if (!food) return;
+      const existing = cart.find(i => i.id === id);
+      if (existing) existing.qty++;
+      else cart.push({ id, qty: 1 });
+      saveCart();
+      showToast(`${food.name} added to cart!`);
+      renderCart();
+      const btn = document.querySelector(`[data-add-id="${id}"]`);
+      if (btn) {
+        btn.classList.add('added');
+        btn.innerHTML = '<i class="fas fa-check"></i> Added!';
+        setTimeout(() => {
+          btn.classList.remove('added');
+          btn.innerHTML = '<i class="fas fa-plus"></i> Add to Cart';
+        }, 1200);
+      }
+    }
+    function removeFromCart(id) {
+      cart = cart.filter(i => i.id !== id);
+      saveCart(); renderCart();
+    }
+    function changeQty(id, delta) {
+      const item = cart.find(i => i.id === id);
+      if (!item) return;
+      item.qty += delta;
+      if (item.qty <= 0) cart = cart.filter(i => i.id !== id);
+      saveCart(); renderCart();
+    }
+    function getCartTotal() {
+      return cart.reduce((sum, item) => {
+        const food = foodDB.find(f => f.id === item.id);
+        return sum + (food ? food.price * item.qty : 0);
+      }, 0);
+    }
+    function openCart() {
+      renderCart();
+      document.getElementById('cartModal').classList.add('open');
+    }
+    function closeCart() {
+      document.getElementById('cartModal').classList.remove('open');
+    }
+    function renderCart() {
+      const body = document.getElementById('cartBody');
+      const footer = document.getElementById('cartFooter');
+      if (cart.length === 0) {
+        body.innerHTML = `<div class="cart-empty"><i class="fas fa-shopping-basket"></i><p>Your cart is empty.<br>Add some delicious food!</p></div>`;
+        footer.style.display = 'none';
+        return;
+      }
+      let html = '';
+      cart.forEach(item => {
+        const food = foodDB.find(f => f.id === item.id);
+        if (!food) return;
+        html += `
+          <div class="cart-item">
+            <img class="cart-item-img" src="${food.img}" alt="${food.name}">
+            <div class="cart-item-info">
+              <h4>${food.name}</h4>
+              <p>₱${food.price} each</p>
+              <div class="qty-controls">
+                <button class="qty-btn" onclick="changeQty(${food.id}, -1)">−</button>
+                <span class="qty-val">${item.qty}</span>
+                <button class="qty-btn" onclick="changeQty(${food.id}, 1)">+</button>
+              </div>
+            </div>
+            <button class="remove-item" onclick="removeFromCart(${food.id})"><i class="fas fa-trash"></i></button>
+          </div>`;
+      });
+      body.innerHTML = html;
+      footer.style.display = 'block';
+      document.getElementById('cartTotal').textContent = '₱' + getCartTotal();
+    }
+    function checkout() {
+      if (cart.length === 0) return;
+      const total = getCartTotal();
+      const count = cart.reduce((s, i) => s + i.qty, 0);
+      
+      const locText = selectedLocation.address ? `<strong>${selectedLocation.name}</strong> (${selectedLocation.address})` : 'your saved address';
+
+      document.getElementById('cartBody').innerHTML = `
+        <div class="checkout-summary">
+          <i class="fas fa-check-circle"></i>
+          <h3>Order Placed!</h3>
+          <p>Your order of <strong>${count} item(s)</strong> totaling <strong>₱${total}</strong> is being prepared.</p>
+          <p style="font-size:0.95rem; margin-bottom: 0.5rem;">Delivering to: ${locText}</p>
+          <p style="font-size:0.95rem;">Estimated delivery: <strong>20–30 minutes</strong> 🛵</p>
+        </div>`;
+      document.getElementById('cartFooter').style.display = 'none';
+      cart = []; saveCart(); showToast('Order placed successfully! 🎉');
+    }
+
+    /* ========== TOAST ========== */
+    let toastTimer;
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      document.getElementById('toastText').textContent = msg;
+      toast.classList.add('show');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => toast.classList.remove('show'), 3000);
+    }
+
+    /* ========== RENDER FOOD CARDS ========== */
+    function createFoodCard(food) {
+      return `
+        <div class="food-card">
+          <div class="food-img" onclick="showFoodDetail(${food.id})">
+            <img src="${food.img}" alt="${food.name}" loading="lazy" onerror="this.src='https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=800&h=600&fit=crop&crop=center'">
+            ${food.badge ? `<span class="promo-badge">${food.badge}</span>` : ''}
+          </div>
+          <div class="food-content">
+            <div class="food-name">
+              <span>${food.name}</span>
+              <span class="rating"><i class="fas fa-star"></i> ${food.rating}</span>
+            </div>
+            <div class="food-desc">${food.desc}</div>
+            <div class="food-price">₱${food.price}</div>
+            <div class="delivery-info">
+              <span><i class="fas fa-clock"></i> ${food.delivery}</span>
+              <span><i class="fas fa-motorcycle"></i> ${food.fee}</span>
+            </div>
+            <button class="add-btn" data-add-id="${food.id}" onclick="addToCart(${food.id}, event)">
+              <i class="fas fa-plus"></i> Add to Cart
+            </button>
+          </div>
+        </div>`;
+    }
+
+    function renderFoods() {
+      let filtered = foodDB;
+      if (currentCategory !== 'all') filtered = filtered.filter(f => f.cat === currentCategory);
+      if (currentSearch) {
+        const q = currentSearch.toLowerCase();
+        filtered = filtered.filter(f =>
+          f.name.toLowerCase().includes(q) || f.desc.toLowerCase().includes(q) || f.tags.some(t => t.includes(q))
+        );
+      }
+
+      const bestGrid = document.getElementById('bestSellersGrid');
+      const topGrid = document.getElementById('topRatedGrid');
+      const noRes = document.getElementById('noResults');
+
+      const best = filtered.filter(f => f.bestSeller);
+      const top = filtered.filter(f => !f.bestSeller);
+
+      if (filtered.length === 0) {
+        bestGrid.innerHTML = ''; topGrid.innerHTML = ''; noRes.style.display = 'block';
+        return;
+      }
+      noRes.style.display = 'none';
+      bestGrid.innerHTML = best.length ? best.map(createFoodCard).join('') : '<p style="color:#888; grid-column:1/-1; text-align:center; padding:1rem;">No best sellers match your filter.</p>';
+      topGrid.innerHTML = top.length ? top.map(createFoodCard).join('') : '<p style="color:#888; grid-column:1/-1; text-align:center; padding:1rem;">No top-rated items match your filter.</p>';
+    }
+
+    /* ========== CATEGORY FILTER ========== */
+    document.querySelectorAll('.category-pill').forEach(pill => {
+      pill.addEventListener('click', function() {
+        document.querySelectorAll('.category-pill').forEach(p => p.classList.remove('active'));
+        this.classList.add('active');
+        currentCategory = this.getAttribute('data-cat');
+        renderFoods();
+        document.querySelector('.section-header').scrollIntoView({behavior:'smooth', block:'start'});
+      });
+    });
+
+    function resetFilter() {
+      currentCategory = 'all'; currentSearch = '';
+      document.getElementById('searchInput').value = '';
+      document.querySelectorAll('.category-pill').forEach(p => {
+        p.classList.toggle('active', p.getAttribute('data-cat') === 'all');
+      });
+      renderFoods();
+    }
+
+    /* ========== SEARCH ========== */
+    document.getElementById('searchBtn').addEventListener('click', doSearch);
+    document.getElementById('searchInput').addEventListener('keypress', (e) => { if (e.key === 'Enter') doSearch(); });
+    document.getElementById('searchInput').addEventListener('input', (e) => { currentSearch = e.target.value.trim(); renderFoods(); });
+
+    function doSearch() {
+      currentSearch = document.getElementById('searchInput').value.trim();
+      renderFoods();
+      document.querySelector('.section-header').scrollIntoView({behavior:'smooth', block:'start'});
+    }
+
+    /* ========== FOOD DETAIL MODAL ========== */
+    function showFoodDetail(id) {
+      const food = foodDB.find(f => f.id === id);
+      if (!food) return;
+      document.getElementById('foodDetailContent').innerHTML = `
+        <img class="food-detail-img" src="${food.img}" alt="${food.name}">
+        <div class="food-detail-body">
+          <h2>${food.name}</h2>
+          <div class="food-detail-meta">
+            <span><i class="fas fa-star" style="color:#f9b21b"></i> ${food.rating} rating</span>
+            <span><i class="fas fa-clock"></i> ${food.delivery}</span>
+            <span><i class="fas fa-motorcycle"></i> ${food.fee}</span>
+          </div>
+          <p class="desc">${food.desc}</p>
+          <div class="price-big">₱${food.price}</div>
+          <div style="display:flex; gap:0.6rem; flex-wrap:wrap;">
+            <button class="add-btn" style="flex:1; margin-top:0;" onclick="addToCart(${food.id}, event); closeFoodDetail();">
+              <i class="fas fa-plus"></i> Add to Cart
+            </button>
+            <button class="add-btn" style="flex:1; margin-top:0; background:#555; box-shadow: none;" onclick="closeFoodDetail()">
+              <i class="fas fa-times"></i> Close
+            </button>
+          </div>
+          <div class="reviews-section">
+            <h3><i class="fas fa-comments"></i> Customer Reviews (${food.reviews.length})</h3>
+            ${food.reviews.map(r => `
+              <div class="review-item">
+                <div class="reviewer"><span>${r.user}</span><span class="stars">${'★'.repeat(r.stars)}</span></div>
+                <p>${r.text}</p>
+              </div>
+            `).join('')}
+          </div>
+        </div>`;
+      document.getElementById('foodDetailModal').classList.add('open');
+    }
+
+    function closeFoodDetail() { document.getElementById('foodDetailModal').classList.remove('open'); }
+
+    document.getElementById('foodDetailModal').addEventListener('click', function(e) { if (e.target === this) closeFoodDetail(); });
+    document.getElementById('cartModal').addEventListener('click', function(e) { if (e.target === this) closeCart(); });
+    document.getElementById('locationModal').addEventListener('click', function(e) { if (e.target === this) closeLocationModal(); });
+
+    /* ========== AI CHATBOT ========== */
+    const chatbotContainer = document.getElementById('chatbotContainer');
+    const chatMessages = document.getElementById('chatMessages');
+    const chatInput = document.getElementById('chatInput');
+
+    document.getElementById('chatbotToggle').addEventListener('click', () => { chatbotContainer.classList.toggle('open'); });
+    function closeChat() { chatbotContainer.classList.remove('open'); }
+
+    function addMessage(text, sender) {
+      const div = document.createElement('div');
+      div.classList.add('message', sender);
+      div.innerHTML = text;
+      chatMessages.appendChild(div);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    function formatFood(food) {
+      return `<strong>${food.name}</strong><br>${food.desc}<br><span class="food-tag">⭐ ${food.rating}</span><span class="food-tag">₱${food.price}</span>`;
+    }
+
+    function generateReply(userText) {
+      const text = userText.toLowerCase().trim();
+      if (text.match(/^(hi|hello|hey|kumusta|kamusta|yo|sup)/)) return "👋 Hello! I'm Mr. Speedy AI. I can help you find great food. Try asking: <em>'What's the best seller?'</em>, <em>'Recommend something spicy'</em>, or <em>'Show me cheap eats'</em>.";
+      if (text.match(/best ?seller|number one|top|pinakamasarap|sikat/)) return `🔥 Our top-rated best sellers right now:<br><br>${foodDB.filter(f => f.rating >= 4.8).slice(0,4).map(f => formatFood(f)).join('<hr style="border:none;border-top:1px solid #eee;margin:0.6rem 0">')}`;
+      if (text.match(/review|rating|feedback|comment|masarap ba/)) {
+        const top = [...foodDB].sort((a,b) => b.rating - a.rating)[0];
+        return `⭐ Our customers love these dishes!<br><br>${formatFood(top)}<br><br>💬 <em>"Sobrang sarap! Perfectly cooked and delivered hot."</em> — Maria, verified order<br><br>Overall rating: <strong>4.8/5</strong> from 12,400+ reviews.`;
+      }
+      if (text.match(/cheap|budget|mura|affordable|tipid|cheapest|low price/)) {
+        const cheap = foodDB.filter(f => f.price <= 220).sort((a,b) => a.price - b.price);
+        return `💰 Here are the most affordable options:<br><br>${cheap.slice(0,4).map(f => formatFood(f)).join('<hr style="border:none;border-top:1px solid #eee;margin:0.6rem 0">')}`;
+      }
+      if (text.match(/mang inasal|inasal/)) {
+        const mi = foodDB.filter(f => f.tags.includes('mang inasal') || f.tags.includes('inasal'));
+        return `🇵🇭 Mang Inasal favorites:<br><br>${mi.map(f => formatFood(f)).join('<hr style="border:none;border-top:1px solid #eee;margin:0.6rem 0">')}`;
+      }
+      if (text.match(/chowking|chao fan|lauriat/)) {
+        const ck = foodDB.filter(f => f.tags.includes('chowking') || f.tags.includes('chao fan') || f.tags.includes('lauriat'));
+        return `🇨🇳 Chowking favorites:<br><br>${ck.map(f => formatFood(f)).join('<hr style="border:none;border-top:1px solid #eee;margin:0.6rem 0">')}`;
+      }
+      if (text.match(/kfc|zinger|famous bowl/)) {
+        const kfc = foodDB.filter(f => f.tags.includes('kfc'));
+        return `🍗 KFC favorites:<br><br>${kfc.map(f => formatFood(f)).join('<hr style="border:none;border-top:1px solid #eee;margin:0.6rem 0">')}`;
+      }
+      if (text.match(/filipino|pinoy|adobo|sisig|lechon|sinigang|kare-kare|pancit/)) {
+        const pinoy = foodDB.filter(f => f.cat === 'filipino');
+        return `🇵🇭 Filipino favorites:<br><br>${pinoy.map(f => formatFood(f)).join('<hr style="border:none;border-top:1px solid #eee;margin:0.6rem 0">')}`;
+      }
+      if (text.match(/fast food|jollibee|mcdonalds|kfc|zinger|yumburger/)) {
+        const ff = foodDB.filter(f => f.cat === 'fastfood');
+        return `🍟 Fast Food Classics:<br><br>${ff.map(f => formatFood(f)).join('<hr style="border:none;border-top:1px solid #eee;margin:0.6rem 0">')}`;
+      }
+      if (text.match(/chicken|manok|fried chicken/)) {
+        const c = foodDB.filter(f => f.tags.includes('chicken'));
+        return `🍗 Chicken lovers, here you go:<br><br>${c.map(f => formatFood(f)).join('<hr style="border:none;border-top:1px solid #eee;margin:0.6rem 0">')}`;
+      }
+      if (text.match(/burger|whopper/)) {
+        const b = foodDB.filter(f => f.tags.includes('burger'));
+        return `🍔 Best burgers on Mr. Speedy:<br><br>${b.map(f => formatFood(f)).join('<hr style="border:none;border-top:1px solid #eee;margin:0.6rem 0">')}`;
+      }
+      if (text.match(/pizza|pepperoni/)) {
+        const p = foodDB.filter(f => f.tags.includes('pizza'));
+        return `🍕 Pizza time:<br><br>${p.map(f => formatFood(f)).join('<hr style="border:none;border-top:1px solid #eee;margin:0.6rem 0">')}`;
+      }
+      if (text.match(/sushi|salmon|japanese|ramen|noodle/)) {
+        const j = foodDB.filter(f => f.tags.includes('japanese') || f.tags.includes('sushi') || f.tags.includes('ramen'));
+        return `🍣 Japanese favorites:<br><br>${j.map(f => formatFood(f)).join('<hr style="border:none;border-top:1px solid #eee;margin:0.6rem 0">')}`;
+      }
+      if (text.match(/vegan|vegetarian|healthy|salad|gulay/)) {
+        const h = foodDB.filter(f => f.tags.includes('vegan') || f.tags.includes('healthy') || f.tags.includes('salad'));
+        return `🥗 Healthy & plant-based picks:<br><br>${h.map(f => formatFood(f)).join('<hr style="border:none;border-top:1px solid #eee;margin:0.6rem 0">')}`;
+      }
+      if (text.match(/dessert|cake|sweet|matamis|ice cream|donut|halo-halo/)) {
+        const d = foodDB.filter(f => f.tags.includes('dessert') || f.tags.includes('sweet') || f.tags.includes('cake') || f.tags.includes('donut') || f.tags.includes('halo-halo'));
+        return `🍰 Sweet treats:<br><br>${d.map(f => formatFood(f)).join('<hr style="border:none;border-top:1px solid #eee;margin:0.6rem 0">')}`;
+      }
+      if (text.match(/breakfast|morning|pancake|almusal|coffee/)) {
+        const bf = foodDB.filter(f => f.tags.includes('breakfast') || f.tags.includes('pancakes') || f.tags.includes('morning') || f.tags.includes('coffee'));
+        return `🌅 Breakfast picks:<br><br>${bf.map(f => formatFood(f)).join('<hr style="border:none;border-top:1px solid #eee;margin:0.6rem 0">')}`;
+      }
+      if (text.match(/delivery|deliver|shipping|speed|fast|bilis|mabilis|location|address/)) return `⚡ Mr. Speedy delivers in <strong>15–35 minutes</strong> depending on the restaurant. You can set your delivery address by clicking the location bar at the top!`;
+      if (text.match(/price|presyo|menu|magkano|how much/)) return `💵 Our menu ranges from <strong>₱85 to ₱925</strong>. Best value: <strong>Jollibee Yumburger (₱85)</strong> and <strong>KFC Famous Bowl (₱90)</strong>.`;
+      
+      const matched = foodDB.filter(f => f.name.toLowerCase().includes(text) || f.tags.some(t => t.includes(text) || text.includes(t)));
+      if (matched.length > 0) return `Here's what I found for "<strong>${userText}</strong>":<br><br>${matched.slice(0,3).map(f => formatFood(f)).join('<hr style="border:none;border-top:1px solid #eee;margin:0.6rem 0">')}`;
+      
+      return `🤔 I'm not sure about "<strong>${userText}</strong>" — but I can help with:<br><br>• <em>"Mang Inasal"</em><br>• <em>"Chowking"</em><br>• <em>"KFC"</em><br>• <em>"Filipino food"</em><br>• <em>"Fast food"</em><br>• <em>"What's the best seller?"</em>`;
+    }
+
+    function sendMessage(text) {
+      if (!text.trim()) return;
+      addMessage(text, 'user');
+      chatInput.value = '';
+      setTimeout(() => addMessage(generateReply(text), 'bot'), 500);
+    }
+
+    chatInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') sendMessage(chatInput.value); });
+    document.querySelectorAll('.quick-reply').forEach(btn => {
+      btn.addEventListener('click', () => sendMessage(btn.getAttribute('data-msg')));
+    });
+
+    /* ========== INIT ========== */
+    updateCartBadge();
+    renderFoods();
+  </script>
+</body>
+</html>
